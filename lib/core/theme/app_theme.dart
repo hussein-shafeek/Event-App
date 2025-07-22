@@ -2,11 +2,11 @@ import 'package:evently/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static ThemeData CustomeDarkTheme = ThemeData(
-    scaffoldBackgroundColor: AppColors.black,
+  static ThemeData CustomeLightTheme = ThemeData(
+    scaffoldBackgroundColor: AppColors.bWhite,
 
     appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.black,
+      backgroundColor: AppColors.bWhite,
       foregroundColor: AppColors.primary,
       centerTitle: true,
       titleTextStyle: TextStyle(
@@ -23,7 +23,7 @@ class AppTheme {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.black.withValues(alpha: 0.7),
+      fillColor: AppColors.bWhite.withValues(alpha: 0.7),
       hintStyle: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.bold,

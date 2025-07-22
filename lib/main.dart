@@ -15,8 +15,8 @@ class EventlyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: AppRoutes.homeScreen,
-      darkTheme: AppTheme.CustomeDarkTheme,
-      themeMode: ThemeMode.dark,
+      theme: AppTheme.CustomeLightTheme,
+      themeMode: ThemeMode.light,
       routes: {AppRoutes.homeScreen: (_) => HomeScreen()},
     );
   }
