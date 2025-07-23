@@ -2,11 +2,18 @@ import 'package:evently/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class AppTheme {
+  // ignore: non_constant_identifier_names
   static ThemeData CustomeLightTheme = ThemeData(
-    scaffoldBackgroundColor: AppColors.bWhite,
+    scaffoldBackgroundColor: AppColors.backgroundWhite,
+
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: AppColors.primary,
+      foregroundColor: AppColors.white,
+      // shape: CircleBorder(side: BorderSide(width: 5, color: AppColors.white)),
+    ),
 
     appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.bWhite,
+      backgroundColor: AppColors.backgroundWhite,
       foregroundColor: AppColors.primary,
       centerTitle: true,
       titleTextStyle: TextStyle(
@@ -17,13 +24,14 @@ class AppTheme {
     ),
     primaryColor: AppColors.primary,
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      selectedItemColor: AppColors.white,
+      unselectedItemColor: AppColors.white,
       backgroundColor: AppColors.primary,
-      showUnselectedLabels: false,
       type: BottomNavigationBarType.fixed,
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.bWhite.withValues(alpha: 0.7),
+      fillColor: AppColors.backgroundWhite.withValues(alpha: 0.7),
       hintStyle: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.bold,
@@ -65,5 +73,10 @@ class AppTheme {
         color: AppColors.white,
       ),
     ),
+  );
+
+  // ignore: non_constant_identifier_names
+  static ThemeData CustomeDarkTheme = ThemeData(
+    scaffoldBackgroundColor: AppColors.backgroundDark,
   );
 }
