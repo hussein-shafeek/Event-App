@@ -12,40 +12,33 @@ class AppTheme {
       // shape: CircleBorder(side: BorderSide(width: 5, color: AppColors.white)),
     ),
 
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.backgroundWhite,
-      foregroundColor: AppColors.primary,
-      centerTitle: true,
-      titleTextStyle: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        color: AppColors.primary,
-      ),
-    ),
-    primaryColor: AppColors.primary,
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      selectedItemColor: AppColors.white,
-      unselectedItemColor: AppColors.white,
-      backgroundColor: AppColors.primary,
-      type: BottomNavigationBarType.fixed,
-    ),
     inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: AppColors.backgroundWhite.withValues(alpha: 0.7),
       hintStyle: TextStyle(
         fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: AppColors.white.withValues(alpha: 0.7),
+        fontWeight: FontWeight.w500,
+        color: AppColors.gray,
       ),
       enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(width: 1, color: AppColors.primary),
-        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AppColors.gray),
+        borderRadius: BorderRadius.circular(16),
       ),
       focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(width: 1, color: AppColors.primary),
-        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AppColors.gray),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: AppColors.red),
       ),
     ),
+
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+    ),
+
     textTheme: TextTheme(
       headlineSmall: TextStyle(
         fontSize: 24,
@@ -54,13 +47,13 @@ class AppTheme {
       ),
       titleLarge: TextStyle(
         fontSize: 20,
-        fontWeight: FontWeight.bold,
+        fontWeight: FontWeight.w500,
         color: AppColors.white,
       ),
       titleMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.bold,
-        color: AppColors.white,
+        color: AppColors.black,
       ),
       titleSmall: TextStyle(
         fontSize: 14,
@@ -72,6 +65,37 @@ class AppTheme {
         fontWeight: FontWeight.bold,
         color: AppColors.white,
       ),
+    ),
+
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.primary,
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          fontStyle: FontStyle.italic,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    ),
+
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppColors.backgroundWhite,
+      foregroundColor: AppColors.primary,
+      centerTitle: true,
+      titleTextStyle: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: AppColors.primary,
+      ),
+    ),
+
+    primaryColor: AppColors.primary,
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      selectedItemColor: AppColors.white,
+      unselectedItemColor: AppColors.white,
+      backgroundColor: AppColors.primary,
+      type: BottomNavigationBarType.fixed,
     ),
   );
 
