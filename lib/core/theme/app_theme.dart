@@ -57,7 +57,7 @@ class AppTheme {
       ),
       titleSmall: TextStyle(
         fontSize: 14,
-        fontWeight: FontWeight.bold,
+        fontWeight: FontWeight.w400,
         color: AppColors.white,
       ),
       displaySmall: TextStyle(

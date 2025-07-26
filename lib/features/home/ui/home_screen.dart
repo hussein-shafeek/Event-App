@@ -3,7 +3,7 @@ import 'package:evently/features/events/ui/love_tab.dart';
 import 'package:evently/features/events/ui/map_tap.dart';
 import 'package:evently/features/events/ui/profile_tab.dart';
 import 'package:evently/features/home/data/nav_bar_icon.dart';
-import 'package:evently/features/home/ui/home_tab.dart';
+import 'package:evently/features/home/ui/home_tab/home_tab.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
