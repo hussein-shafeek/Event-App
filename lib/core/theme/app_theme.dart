@@ -19,11 +19,11 @@ class AppTheme {
         color: AppColors.gray,
       ),
       enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: AppColors.gray),
+        borderSide: BorderSide(color: AppColors.primary),
         borderRadius: BorderRadius.circular(16),
       ),
       focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: AppColors.gray),
+        borderSide: BorderSide(color: AppColors.primary),
         borderRadius: BorderRadius.circular(16),
       ),
       errorBorder: OutlineInputBorder(
