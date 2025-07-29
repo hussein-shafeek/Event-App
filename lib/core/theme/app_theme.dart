@@ -5,6 +5,15 @@ class AppTheme {
   // ignore: non_constant_identifier_names
   static ThemeData CustomeLightTheme = ThemeData(
     scaffoldBackgroundColor: AppColors.backgroundWhite,
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppColors.backgroundWhite,
+      centerTitle: true,
+      titleTextStyle: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w500,
+        color: AppColors.primary,
+      ),
+    ),
 
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: AppColors.primary,
@@ -76,17 +85,6 @@ class AppTheme {
           fontStyle: FontStyle.italic,
           decoration: TextDecoration.underline,
         ),
-      ),
-    ),
-
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.backgroundWhite,
-      foregroundColor: AppColors.primary,
-      centerTitle: true,
-      titleTextStyle: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        color: AppColors.primary,
       ),
     ),
 

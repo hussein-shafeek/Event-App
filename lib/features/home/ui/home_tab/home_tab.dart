@@ -16,7 +16,7 @@ class HomeTab extends StatelessWidget {
           child: ListView.separated(
             padding: EdgeInsets.symmetric(horizontal: 16),
             itemBuilder: (_, index) => EventItem(),
-            separatorBuilder: (_, _) => SizedBox(height: 16),
+            separatorBuilder: (_, index) => SizedBox(height: 16),
             itemCount: 20,
           ),
         ),

@@ -21,6 +21,7 @@ class ProfileHeader extends StatelessWidget {
             Image.asset(
               'assets/images/route_profile.png',
               height: height * 0.13,
+              fit: BoxFit.fill,
             ),
             SizedBox(width: 16),
             Expanded(
