@@ -1,9 +1,11 @@
 import 'package:evently/core/models/category_model.dart';
+import 'package:evently/core/models/event_models.dart';
+import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/core/utils/tab_item.dart';
-
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -16,14 +18,20 @@ class CreateEventScreen extends StatefulWidget {
 
 class _CreateEventScreenState extends State<CreateEventScreen> {
   int currentIndex = 0;
+  DateTime? selectedDate;
+  TimeOfDay? selectedTime;
+  CategoryModel selectedCategory = CategoryModel.categories.first;
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
+  DateFormat dateFormat = DateFormat('d/M/yyyy');
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.sizeOf(context).width;
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(title: Text('Create Event')),
       body: Column(
@@ -33,7 +41,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Image.asset(
-                'assets/images/sport.png',
+                'assets/images/${selectedCategory.imageName}.png',
                 height: height * 0.23,
                 width: double.infinity,
                 fit: BoxFit.fill,
@@ -47,8 +55,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               onTap: (index) {
                 if (currentIndex == index) return;
                 currentIndex = index;
+                selectedCategory = CategoryModel.categories[currentIndex];
                 setState(() {});
               },
+
               isScrollable: true,
               indicatorColor: Colors.transparent,
               dividerColor: Colors.transparent,
@@ -114,16 +124,21 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       Spacer(),
                       InkWell(
                         onTap: () async {
-                          DateTime? data = await showDatePicker(
+                          DateTime? date = await showDatePicker(
                             context: context,
                             firstDate: DateTime.now(),
                             lastDate: DateTime.now().add(Duration(days: 365)),
                             initialEntryMode: DatePickerEntryMode.calendarOnly,
                           );
-                          print(data);
+                          if (date != null) {
+                            selectedDate = date;
+                            setState(() {});
+                          }
                         },
                         child: Text(
-                          'Select Date',
+                          selectedDate == null
+                              ? 'Select Date'
+                              : dateFormat.format(selectedDate!),
                           style: text.titleMedium!.copyWith(
                             color: AppColors.primary,
                           ),
@@ -144,10 +159,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                             context: context,
                             initialTime: TimeOfDay.now(),
                           );
-                          print(time);
+                          if (time != null) {
+                            selectedTime = time;
+                            setState(() {});
+                          }
                         },
                         child: Text(
-                          'Select Time',
+                          selectedTime == null
+                              ? 'Select Time'
+                              : selectedTime!.format(context),
                           style: text.titleMedium!.copyWith(
                             color: AppColors.primary,
                           ),
@@ -170,6 +190,25 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   void createEvent() {
-    if (formkey.currentState!.validate()) {}
+    if (formkey.currentState!.validate() &&
+        selectedDate != null &&
+        selectedTime != null) {
+      DateTime dateTime = DateTime(
+        selectedDate!.year,
+        selectedDate!.month,
+        selectedDate!.day,
+        selectedTime!.hour,
+        selectedTime!.minute,
+      );
+      EventModel event = EventModel(
+        category: selectedCategory,
+        title: titleController.text,
+        description: descriptionController.text,
+        dateTime: dateTime,
+      );
+      FireBaseService.createEvent(event).then((_) {
+        Navigator.of(context).pop();
+      });
+    }
   }
 }
