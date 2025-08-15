@@ -4,8 +4,10 @@ import 'package:evently/core/utils/tab_item.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class HomeHeader extends StatefulWidget {
-  const HomeHeader({super.key});
+  void Function(CategoryModel?) filterEvents;
+  HomeHeader({required this.filterEvents});
 
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
@@ -48,6 +50,11 @@ class _HomeHeaderState extends State<HomeHeader> {
                 onTap: (index) {
                   if (currentIndex == index) return;
                   currentIndex = index;
+                  CategoryModel? selectedCatogry =
+                      currentIndex == 0
+                          ? null
+                          : CategoryModel.categories[currentIndex - 1];
+                  widget.filterEvents(selectedCatogry);
                   setState(() {});
                 },
 
