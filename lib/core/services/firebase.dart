@@ -26,4 +26,34 @@ class FireBaseService {
         await eventCollection.orderBy('timestamp').get();
     return querySnapshot.docs.map((docScapshot) => docScapshot.data()).toList();
   }
+
+  static Stream<List<EventModel>> getEventStream() {
+    return getEventCollection().snapshots().map((querySnapshot) {
+      return querySnapshot.docs.map((doc) => doc.data()).toList();
+    });
+  }
+
+  static Future<void> deleteEvent(String eventId) async {
+    // 1. Get a reference to the events collection
+    CollectionReference<EventModel> eventCollection = getEventCollection();
+
+    // 2. Get a reference to the specific document to delete using its ID
+    DocumentReference<EventModel> eventDoc = eventCollection.doc(eventId);
+
+    // 3. Delete the document
+    await eventDoc.delete();
+  }
+
+  static Future<void> updateEvent(EventModel event) async {
+    // 1. Get a reference to the events collection
+    CollectionReference<EventModel> eventCollection = getEventCollection();
+
+    // 2. Get the specific document to update using its ID
+    DocumentReference<EventModel> eventDoc = eventCollection.doc(event.id);
+
+    // 3. Update the document with the new data
+    // The `set` method with a merge option is great for updating specific fields
+    // but in this case, we're replacing the whole object, so `set` alone is fine.
+    await eventDoc.set(event);
+  }
 }

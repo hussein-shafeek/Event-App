@@ -13,46 +13,55 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-  List<EventModel> allEvents = [];
-  List<EventModel> displayedEvents = [];
-  @override
-  void initState() {
-    super.initState();
-    getEvents();
+  // 1. إضافة متغير حالة جديد لتتبع الفئة المحددة حالياً
+  CategoryModel? _selectedCategory;
+
+  void filterEvents(CategoryModel? category) {
+    // 2. تعديل دالة الفلترة: الآن تقوم فقط بتحديث الفئة المختارة وإعادة بناء الواجهة
+    _selectedCategory = category;
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    // ignore: avoid_unnecessary_containers
     return Column(
       children: [
         HomeHeader(filterEvents: filterEvents),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         Expanded(
-          child: ListView.separated(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            itemBuilder: (_, index) => EventItem(displayedEvents[index]),
-            separatorBuilder: (_, index) => SizedBox(height: 16),
-            itemCount: displayedEvents.length,
+          // 3. استخدام StreamBuilder لجلب البيانات اللحظية
+          child: StreamBuilder<List<EventModel>>(
+            stream: FireBaseService.getEventStream(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return const Center(child: Text('Something went wrong!'));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(child: Text('No events found.'));
+              } else {
+                final allEvents = snapshot.data!;
+                List<EventModel> displayedEvents = allEvents;
+
+                // 4. تطبيق منطق الفلتر مباشرة على البيانات التي وصلت من الـ Stream
+                if (_selectedCategory != null) {
+                  displayedEvents =
+                      allEvents
+                          .where((event) => event.category == _selectedCategory)
+                          .toList();
+                }
+
+                return ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemBuilder: (_, index) => EventItem(displayedEvents[index]),
+                  separatorBuilder: (_, index) => const SizedBox(height: 16),
+                  itemCount: displayedEvents.length,
+                );
+              }
+            },
           ),
         ),
       ],
     );
-  }
-
-  Future<void> getEvents() async {
-    allEvents = await FireBaseService.getEvents();
-    displayedEvents = allEvents;
-    setState(() {});
-  }
-
-  void filterEvents(CategoryModel? catogory) {
-    if (catogory == null) {
-      displayedEvents = allEvents;
-    } else {
-      displayedEvents =
-          allEvents.where((event) => event.category == catogory).toList();
-      setState(() {});
-    }
   }
 }

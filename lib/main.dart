@@ -1,8 +1,11 @@
+import 'package:evently/core/models/event_models.dart';
 import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/theme/app_theme.dart';
 import 'package:evently/features/auth/ui/login_screen.dart';
 import 'package:evently/features/auth/ui/register_screen.dart';
 import 'package:evently/features/events/ui/create_event/create_event_screen.dart';
+import 'package:evently/features/events/ui/details_edit_event/details_screen.dart';
+import 'package:evently/features/events/ui/details_edit_event/edit_Event.dart';
 import 'package:evently/features/home/ui/home_screen.dart';
 import 'package:evently/features/onboarding/ui/onboarding_screen.dart';
 import 'package:flutter/material.dart';
@@ -59,6 +62,11 @@ class EventlyApp extends StatelessWidget {
         AppRoutes.loginScreen: (_) => LoginScreen(),
         AppRoutes.registerScreen: (_) => RegisterScreen(),
         AppRoutes.createEvent: (_) => CreateEventScreen(),
+        AppRoutes.detailsScreen: (_) => DetailsScreen(),
+        AppRoutes.editEvent:
+            (context) => EditEventScreen(
+              event: ModalRoute.of(context)!.settings.arguments as EventModel,
+            ),
       },
     );
   }
