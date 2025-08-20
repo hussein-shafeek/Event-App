@@ -14,77 +14,82 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailsScreenState extends State<DetailsScreen> {
-  // 1. تعريف متغير الحدث هنا وليس في دالة build
-  late EventModel event;
+  late EventModel initialEvent; // بناخدها مرّة من arguments
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // 2. استلام البيانات في didChangeDependencies
-    // هذا يسمح لك بالوصول إلى الـ arguments
-    event = ModalRoute.of(context)!.settings.arguments as EventModel;
+    initialEvent = ModalRoute.of(context)!.settings.arguments as EventModel;
   }
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.sizeOf(context).height;
-    TextTheme text = Theme.of(context).textTheme;
-    final DateFormat formatter = DateFormat('dd MMMM yyyy, hh:mm a');
+    final height = MediaQuery.sizeOf(context).height;
+    final text = Theme.of(context).textTheme;
+    final formatter = DateFormat('dd MMMM yyyy, hh:mm a');
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Event Details'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
-            onPressed: () async {
-              final result = await Navigator.pushNamed(
-                context,
-                AppRoutes.editEvent,
-                arguments: event,
-              );
+    return StreamBuilder<EventModel?>(
+      stream: FireBaseService.watchEvent(initialEvent.id),
+      builder: (context, snapshot) {
+        // لو الدوك اتعمله delete نرجع للشاشة اللي قبلها
+        if (snapshot.hasData && snapshot.data == null) {
+          // اتأكد إننا على فريم بعد البناء
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) Navigator.pop(context);
+          });
+          return const SizedBox.shrink();
+        }
 
-              if (mounted && result is EventModel) {
-                // 3. تحديث المتغير باستخدام setState
-                setState(() {
-                  event = result;
-                });
-              }
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete, color: AppColors.red),
-            onPressed: () async {
-              await FireBaseService.deleteEvent(event.id);
-              if (mounted) {
-                Navigator.of(context).pop();
-              }
-            },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.asset(
-                  'assets/images/${event.category.imageName}.png',
-                  height: height * 0.23,
-                  width: double.infinity,
-                  fit: BoxFit.fill,
-                ),
+        // أول مرة ممكن ما يكونش في بيانات، اعرض النسخة المبدئية (arguments)
+        final event = snapshot.data ?? initialEvent;
+
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Event Details'),
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_new,
+                color: AppColors.primary,
               ),
-              Column(
+              onPressed: () => Navigator.pop(context),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
+                onPressed: () async {
+                  // نبعت أحدث نسخة للـ Edit
+                  await Navigator.pushNamed(
+                    context,
+                    AppRoutes.editEvent,
+                    arguments: event,
+                  );
+                  // مش محتاجين setState.. الـ Stream هيحدّث لوحده
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: AppColors.red),
+                onPressed: () async {
+                  await FireBaseService.deleteEvent(event.id);
+                  if (mounted) Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      'assets/images/${event.category.imageName}.png',
+                      height: height * 0.23,
+                      width: double.infinity,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     event.title,
@@ -105,17 +110,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         children: [
                           SvgPicture.asset('assets/icons/calinder.svg'),
                           const SizedBox(width: 8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                formatter.format(event.dateTime),
-                                style: text.titleMedium!.copyWith(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            formatter.format(event.dateTime),
+                            style: text.titleMedium!.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ],
                       ),
@@ -144,30 +144,30 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  Image.asset('assets/images/map.png'),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Description',
+                    style: text.titleMedium!.copyWith(
+                      color: AppColors.black,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    event.description,
+                    style: text.titleMedium!.copyWith(
+                      color: AppColors.black,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Image.asset('assets/images/map.png'),
-              const SizedBox(height: 16),
-              Text(
-                'Description',
-                style: text.titleMedium!.copyWith(
-                  color: AppColors.black,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                event.description,
-                style: text.titleMedium!.copyWith(
-                  color: AppColors.black,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

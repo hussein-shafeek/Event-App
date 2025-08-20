@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evently/core/models/category_model.dart';
-import 'package:flutter/foundation.dart';
 
 class EventModel {
   String id;
@@ -8,6 +7,7 @@ class EventModel {
   String title;
   String description;
   DateTime dateTime;
+
   EventModel({
     this.id = '',
     required this.category,
@@ -15,16 +15,20 @@ class EventModel {
     required this.description,
     required this.dateTime,
   });
-  EventModel.fromjson(Map<String, dynamic> json)
-    : this(
-        id: json['id'],
-        category: CategoryModel.categories.firstWhere(
-          (Category) => Category.id == json['categoryId'],
-        ),
-        title: json['title'],
-        description: json['description'],
-        dateTime: (json['timestamp'] as Timestamp).toDate(),
-      );
+
+  /// Factory constructor علشان يشتغل مع Firestore
+  factory EventModel.fromJson(Map<String, dynamic> json, String id) {
+    return EventModel(
+      id: id,
+      category: CategoryModel.categories.firstWhere(
+        (c) => c.id == json['categoryId'],
+        orElse: () => CategoryModel.categories.first,
+      ),
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      dateTime: (json['timestamp'] as Timestamp).toDate(),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'id': id,
