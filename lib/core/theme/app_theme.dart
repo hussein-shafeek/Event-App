@@ -5,6 +5,15 @@ class AppTheme {
   // ignore: non_constant_identifier_names
   static ThemeData CustomeLightTheme = ThemeData(
     scaffoldBackgroundColor: AppColors.backgroundWhite,
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppColors.backgroundWhite,
+      centerTitle: true,
+      titleTextStyle: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w500,
+        color: AppColors.primary,
+      ),
+    ),
 
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: AppColors.primary,
@@ -19,11 +28,11 @@ class AppTheme {
         color: AppColors.gray,
       ),
       enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: AppColors.gray),
+        borderSide: BorderSide(color: AppColors.primary),
         borderRadius: BorderRadius.circular(16),
       ),
       focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: AppColors.gray),
+        borderSide: BorderSide(color: AppColors.primary),
         borderRadius: BorderRadius.circular(16),
       ),
       errorBorder: OutlineInputBorder(
@@ -57,7 +66,7 @@ class AppTheme {
       ),
       titleSmall: TextStyle(
         fontSize: 14,
-        fontWeight: FontWeight.bold,
+        fontWeight: FontWeight.w400,
         color: AppColors.white,
       ),
       displaySmall: TextStyle(
@@ -76,17 +85,6 @@ class AppTheme {
           fontStyle: FontStyle.italic,
           decoration: TextDecoration.underline,
         ),
-      ),
-    ),
-
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.backgroundWhite,
-      foregroundColor: AppColors.primary,
-      centerTitle: true,
-      titleTextStyle: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        color: AppColors.primary,
       ),
     ),
 

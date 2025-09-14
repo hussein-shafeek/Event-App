@@ -1,9 +1,10 @@
+import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/features/events/ui/love_tab.dart';
 import 'package:evently/features/events/ui/map_tap.dart';
-import 'package:evently/features/events/ui/profile_tab.dart';
+import 'package:evently/features/events/ui/profile/profile_tab.dart';
 import 'package:evently/features/home/data/nav_bar_icon.dart';
-import 'package:evently/features/home/ui/home_tab.dart';
+import 'package:evently/features/home/ui/home_tab/home_tab.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,8 +23,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: tabs[currentIndex],
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => Navigator.pushNamed(context, AppRoutes.createEvent),
         child: Icon(Icons.add, size: 36),
+        //backgroundColor: AppColors.primary,
+        shape: CircleBorder(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
