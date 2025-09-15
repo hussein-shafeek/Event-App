@@ -16,62 +16,87 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.sizeOf(context).width;
-    double height = MediaQuery.sizeOf(context).height;
+    double height = MediaQuery.of(context).size.height;
     TextTheme text = Theme.of(context).textTheme;
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/images/logo.png',
-              fit: BoxFit.fill,
-              height: height * 0.2,
+      //resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Form(
+            key: formKey,
+            child: SizedBox(
+              height: height - MediaQuery.of(context).padding.top,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/logo.png',
+                    fit: BoxFit.fill,
+                    height: height * 0.2,
+                  ),
+                  SizedBox(height: 24),
+                  DefaultTextFormField(
+                    hintText: 'Email',
+                    controller: emailController,
+                    prefixIconImageName: 'Email',
+                    validator: (value) {
+                      if (value == null || value.length < 5) {
+                        return 'Invalid email';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  DefaultTextFormField(
+                    hintText: 'Password',
+                    isPassword: true,
+                    controller: passwordController,
+                    prefixIconImageName: 'lock',
+                    validator: (value) {
+                      if (value == null || value.length < 8) {
+                        return 'Password must be at least 8 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 24),
+                  DefaultElevatedButton(label: 'Login', onPressed: login),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Don’t Have Account ?', style: text.titleMedium),
+                      TextButton(
+                        onPressed:
+                            () => Navigator.of(
+                              context,
+                            ).pushReplacementNamed(AppRoutes.registerScreen),
+                        child: Text('Create Account'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            SizedBox(height: 24),
-            DefaultTextFormField(
-              hintText: 'Email',
-              controller: emailController,
-              prefixIconImageName: 'Email',
-            ),
-            SizedBox(height: 16),
-            DefaultTextFormField(
-              hintText: 'Password',
-              controller: passwordController,
-              prefixIconImageName: 'lock',
-            ),
-            SizedBox(height: 24),
-            DefaultElevatedButton(label: 'Login', onPressed: login),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Don’t Have Account ?', style: text.titleMedium),
-                TextButton(
-                  onPressed:
-                      () => Navigator.of(
-                        context,
-                      ).pushReplacementNamed(AppRoutes.registerScreen),
-                  child: Text('Create Account'),
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
   void login() {
-    FireBaseService.login(
-      email: emailController.text,
-      password: passwordController.text,
-    ).then((user) {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.homeScreen);
-    });
+    if (formKey.currentState!.validate()) {
+      FireBaseService.login(
+        email: emailController.text,
+        password: passwordController.text,
+      ).then((user) {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.homeScreen);
+      });
+    }
   }
 }
