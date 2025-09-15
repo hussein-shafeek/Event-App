@@ -1,7 +1,10 @@
 import 'package:evently/core/routes/routes.dart';
+import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/features/auth/logic/register_logic.dart';
+import 'package:evently/features/home/ui/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -51,10 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               prefixIconImageName: 'lock',
             ),
             SizedBox(height: 24),
-            DefaultElevatedButton(
-              label: 'Create Account',
-              onPressed: RegisterLogic.register,
-            ),
+            DefaultElevatedButton(label: 'Create Account', onPressed: register),
             SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -73,5 +73,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
+  }
+
+  void register() {
+    FireBaseService.register(
+      name: nameController.text,
+      email: emailController.text,
+      password: passwordController.text,
+    ).then((user) {
+      Navigator.of(context).pushReplacementNamed(AppRoutes.homeScreen);
+    });
   }
 }
