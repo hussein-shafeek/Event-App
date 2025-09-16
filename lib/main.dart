@@ -51,7 +51,7 @@ class EventlyApp extends StatelessWidget {
       // @desc: Set the initial route based on the onboarding status.
       initialRoute:
           showOnboarding == true
-              ? AppRoutes.homeScreen
+              ? AppRoutes.loginScreen
               : AppRoutes.onboardingScreen,
       darkTheme: AppTheme.CustomeDarkTheme,
       theme: AppTheme.CustomeLightTheme,
