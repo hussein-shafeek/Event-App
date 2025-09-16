@@ -2,8 +2,10 @@ import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
+import 'package:evently/features/auth/data/ui_utils.dart';
 import 'package:evently/features/auth/logic/login_logic.dart';
 import 'package:evently/features/home/ui/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -92,11 +94,22 @@ class _LoginScreenState extends State<LoginScreen> {
   void login() {
     if (formKey.currentState!.validate()) {
       FireBaseService.login(
-        email: emailController.text,
-        password: passwordController.text,
-      ).then((user) {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.homeScreen);
-      });
+            email: emailController.text,
+            password: passwordController.text,
+          )
+          .then((user) {
+            Navigator.of(context).pushReplacementNamed(AppRoutes.homeScreen);
+            // لعرض رسالة نجاح بعد تسجيل الدخول
+            UIUtils.showSuccessMessage(context, 'Login successful!');
+          })
+          .catchError((error) {
+            String? errorMessage;
+            if (error is FirebaseAuthException) {
+              errorMessage = error.message;
+            }
+            // تمرير الـ context إلى دالة رسالة الخطأ
+            UIUtils.showErrorMessage(context, errorMessage);
+          });
     }
   }
 }
