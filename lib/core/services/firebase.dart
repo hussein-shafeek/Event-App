@@ -69,6 +69,7 @@ class FireBaseService {
     UserCredential credential = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password);
     UserModel user = UserModel(
+      favouriteEventsIds: [],
       id: credential.user!.uid,
       name: name,
       email: email,
@@ -92,4 +93,24 @@ class FireBaseService {
   }
 
   static Future<void> logout() => FirebaseAuth.instance.signOut();
+
+  static Future<void> addEventToFavorites(String eventId) async {
+    CollectionReference<UserModel> usersCollection = getUsersCollection();
+    DocumentReference<UserModel> userDoc = usersCollection.doc(
+      FirebaseAuth.instance.currentUser!.uid,
+    );
+    return userDoc.update({
+      'favouriteEventsIds': FieldValue.arrayUnion([eventId]),
+    });
+  }
+
+  static Future<void> removeEventFromFavorites(String eventId) async {
+    CollectionReference<UserModel> usersCollection = getUsersCollection();
+    DocumentReference<UserModel> userDoc = usersCollection.doc(
+      FirebaseAuth.instance.currentUser!.uid,
+    );
+    return userDoc.update({
+      'favouriteEventsIds': FieldValue.arrayRemove([eventId]),
+    });
+  }
 }
