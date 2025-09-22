@@ -18,11 +18,10 @@ class EventModel {
     required this.dateTime,
   });
 
-  /// Factory constructor علشان يشتغل مع Firestore
-  factory EventModel.fromJson(Map<String, dynamic> json, String id) {
+  factory EventModel.fromJson(Map<String, dynamic> json, String docId) {
     return EventModel(
-      id: json['id'],
-      userId: json['userId'],
+      id: docId, //  Use docId, not json['id']
+      userId: json['userId'] ?? '',
       category: CategoryModel.categories.firstWhere(
         (c) => c.id == json['categoryId'],
         orElse: () => CategoryModel.categories.first,

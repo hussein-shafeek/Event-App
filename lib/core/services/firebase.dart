@@ -26,6 +26,16 @@ class FireBaseService {
     final eventCollection = getEventCollection();
     final doc = eventCollection.doc();
     event.id = doc.id;
+
+    // Verify that the current user exists.
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      throw Exception("No logged in user");
+    }
+
+    // Associate the event with the userId of the current user.
+    event.userId = currentUser.uid;
+
     await doc.set(event);
   }
 
