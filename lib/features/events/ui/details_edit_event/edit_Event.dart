@@ -5,6 +5,7 @@ import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/core/utils/tab_item.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -222,6 +223,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
         selectedTime.minute,
       );
       EventModel updatedEvent = EventModel(
+        userId: FirebaseAuth.instance.currentUser!.uid,
         id: widget.event.id,
         category: selectedCategory,
         title: titleController.text,

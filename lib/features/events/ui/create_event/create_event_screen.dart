@@ -5,6 +5,9 @@ import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/core/utils/tab_item.dart';
+import 'package:evently/features/auth/data/ui_utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -204,14 +207,26 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         selectedTime!.minute,
       );
       EventModel event = EventModel(
+        userId: FirebaseAuth.instance.currentUser!.uid,
         category: selectedCategory,
         title: titleController.text,
         description: descriptionController.text,
         dateTime: dateTime,
       );
-      FireBaseService.createEvent(event).then((_) {
-        Navigator.of(context).pop();
-      });
+      FireBaseService.createEvent(event)
+          .then((_) {
+            Navigator.of(context).pop();
+            UIUtils.showSuccessMessage(context, 'Event added successfully!');
+          })
+          .catchError((error) {
+            // قم بإنشاء رسالة خطأ
+            String errorMessage = 'Something went wrong while adding the event';
+            if (error is FirebaseException) {
+              errorMessage = error.message ?? 'An unexpected error occurred';
+            }
+            // وقم بتمرير الـ context والرسالة للدالة
+            UIUtils.showErrorMessage(context, errorMessage);
+          });
     }
   }
 }

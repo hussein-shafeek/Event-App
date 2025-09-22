@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evently/core/models/event_models.dart';
+import 'package:evently/core/models/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FireBaseService {
   static CollectionReference<EventModel> getEventCollection() =>
@@ -11,11 +13,29 @@ class FireBaseService {
                     EventModel.fromJson(docSnapshot.data()!, docSnapshot.id),
             toFirestore: (event, _) => event.toJson(),
           );
+  static CollectionReference<UserModel> getUsersCollection() =>
+      FirebaseFirestore.instance
+          .collection('users')
+          .withConverter<UserModel>(
+            fromFirestore:
+                (docSnapshot, _) => UserModel.fromJson(docSnapshot.data()!),
+            toFirestore: (user, _) => user.toJson(),
+          );
 
   static Future<void> createEvent(EventModel event) async {
     final eventCollection = getEventCollection();
     final doc = eventCollection.doc();
     event.id = doc.id;
+
+    // Verify that the current user exists.
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      throw Exception("No logged in user");
+    }
+
+    // Associate the event with the userId of the current user.
+    event.userId = currentUser.uid;
+
     await doc.set(event);
   }
 
@@ -49,5 +69,58 @@ class FireBaseService {
         .doc(id)
         .snapshots()
         .map((snap) => snap.data()); // EventModel? (ممكن تبقى null لو اتمسح)
+  }
+
+  static Future<UserModel> register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    UserCredential credential = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
+    UserModel user = UserModel(
+      favouriteEventsIds: [],
+      id: credential.user!.uid,
+      name: name,
+      email: email,
+    );
+    CollectionReference<UserModel> usersCollection = getUsersCollection();
+    await usersCollection.doc(user.id).set(user);
+    return user;
+  }
+
+  static Future<UserModel> login({
+    required String email,
+    required String password,
+  }) async {
+    UserCredential credential = await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password);
+
+    CollectionReference<UserModel> usersCollection = getUsersCollection();
+    DocumentSnapshot<UserModel> docSnapshot =
+        await usersCollection.doc(credential.user!.uid).get();
+    return docSnapshot.data()!;
+  }
+
+  static Future<void> logout() => FirebaseAuth.instance.signOut();
+
+  static Future<void> addEventToFavorites(String eventId) async {
+    CollectionReference<UserModel> usersCollection = getUsersCollection();
+    DocumentReference<UserModel> userDoc = usersCollection.doc(
+      FirebaseAuth.instance.currentUser!.uid,
+    );
+    return userDoc.update({
+      'favouriteEventsIds': FieldValue.arrayUnion([eventId]),
+    });
+  }
+
+  static Future<void> removeEventFromFavorites(String eventId) async {
+    CollectionReference<UserModel> usersCollection = getUsersCollection();
+    DocumentReference<UserModel> userDoc = usersCollection.doc(
+      FirebaseAuth.instance.currentUser!.uid,
+    );
+    return userDoc.update({
+      'favouriteEventsIds': FieldValue.arrayRemove([eventId]),
+    });
   }
 }
