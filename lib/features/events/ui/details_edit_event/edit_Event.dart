@@ -5,38 +5,59 @@ import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/core/utils/tab_item.dart';
-import 'package:evently/features/auth/data/ui_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
-class CreateEventScreen extends StatefulWidget {
-  const CreateEventScreen({super.key});
+class EditEventScreen extends StatefulWidget {
+  final EventModel event;
+  const EditEventScreen({super.key, required this.event});
 
   @override
-  State<CreateEventScreen> createState() => _CreateEventScreenState();
+  State<EditEventScreen> createState() => _EditEventScreenState();
 }
 
-class _CreateEventScreenState extends State<CreateEventScreen> {
-  int currentIndex = 0;
-  DateTime? selectedDate;
-  TimeOfDay? selectedTime;
-  CategoryModel selectedCategory = CategoryModel.categories.first;
-  TextEditingController titleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
+class _EditEventScreenState extends State<EditEventScreen> {
+  late int currentIndex;
+  late DateTime selectedDate;
+  late TimeOfDay selectedTime;
+  late CategoryModel selectedCategory;
+  late TextEditingController titleController;
+  late TextEditingController descriptionController;
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
   DateFormat dateFormat = DateFormat('d/M/yyyy');
 
   @override
+  void initState() {
+    super.initState();
+    // 1. ملء البيانات القديمة
+    currentIndex = CategoryModel.categories.indexOf(widget.event.category);
+    selectedCategory = widget.event.category;
+    selectedDate = widget.event.dateTime;
+    selectedTime = TimeOfDay.fromDateTime(widget.event.dateTime);
+    titleController = TextEditingController(text: widget.event.title);
+    descriptionController = TextEditingController(
+      text: widget.event.description,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.sizeOf(context).width;
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Create Event')),
+      appBar: AppBar(
+        title: const Text('Edit Event'),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: AppColors.primary, // تم تعديل هذا السطر
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -52,7 +73,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 ),
               ),
             ),
-
             DefaultTabController(
               length: CategoryModel.categories.length,
               child: TabBar(
@@ -62,13 +82,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   selectedCategory = CategoryModel.categories[currentIndex];
                   setState(() {});
                 },
-
                 isScrollable: true,
                 indicatorColor: Colors.transparent,
                 dividerColor: Colors.transparent,
                 tabAlignment: TabAlignment.start,
-                labelPadding: EdgeInsets.only(right: 10),
-                padding: EdgeInsets.only(left: 16),
+                labelPadding: const EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.only(left: 16),
                 tabs:
                     CategoryModel.categories
                         .map(
@@ -94,7 +113,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Title", style: text.titleMedium),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     DefaultTextFormField(
                       hintText: 'Event Title',
                       prefixIconImageName: 'title',
@@ -106,9 +125,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Text("Description", style: text.titleMedium),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     DefaultTextFormField(
                       hintText: 'Event Description',
                       controller: descriptionController,
@@ -119,19 +138,22 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Row(
                       children: [
                         SvgPicture.asset('assets/icons/date.svg'),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Text('Event Date', style: text.titleMedium),
-                        Spacer(),
+                        const Spacer(),
                         InkWell(
                           onTap: () async {
                             DateTime? date = await showDatePicker(
                               context: context,
                               firstDate: DateTime.now(),
-                              lastDate: DateTime.now().add(Duration(days: 365)),
+                              lastDate: DateTime.now().add(
+                                const Duration(days: 365),
+                              ),
+                              initialDate: selectedDate,
                               initialEntryMode:
                                   DatePickerEntryMode.calendarOnly,
                             );
@@ -141,9 +163,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                             }
                           },
                           child: Text(
-                            selectedDate == null
-                                ? 'Select Date'
-                                : dateFormat.format(selectedDate!),
+                            dateFormat.format(selectedDate),
                             style: text.titleMedium!.copyWith(
                               color: AppColors.primary,
                             ),
@@ -151,18 +171,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Row(
                       children: [
                         SvgPicture.asset('assets/icons/time.svg'),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Text('Event Time', style: text.titleMedium),
-                        Spacer(),
+                        const Spacer(),
                         InkWell(
                           onTap: () async {
                             TimeOfDay? time = await showTimePicker(
                               context: context,
-                              initialTime: TimeOfDay.now(),
+                              initialTime: selectedTime,
                             );
                             if (time != null) {
                               selectedTime = time;
@@ -170,9 +190,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                             }
                           },
                           child: Text(
-                            selectedTime == null
-                                ? 'Select Time'
-                                : selectedTime!.format(context),
+                            selectedTime.format(context),
                             style: text.titleMedium!.copyWith(
                               color: AppColors.primary,
                             ),
@@ -180,10 +198,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     DefaultElevatedButton(
-                      label: 'Add Event',
-                      onPressed: createEvent,
+                      label: 'Update Event',
+                      onPressed: updateEvent,
                     ),
                   ],
                 ),
@@ -195,38 +213,29 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
-  void createEvent() {
-    if (formkey.currentState!.validate() &&
-        selectedDate != null &&
-        selectedTime != null) {
+  void updateEvent() async {
+    if (formkey.currentState!.validate()) {
       DateTime dateTime = DateTime(
-        selectedDate!.year,
-        selectedDate!.month,
-        selectedDate!.day,
-        selectedTime!.hour,
-        selectedTime!.minute,
+        selectedDate.year,
+        selectedDate.month,
+        selectedDate.day,
+        selectedTime.hour,
+        selectedTime.minute,
       );
-      EventModel event = EventModel(
+      EventModel updatedEvent = EventModel(
         userId: FirebaseAuth.instance.currentUser!.uid,
+        id: widget.event.id,
         category: selectedCategory,
         title: titleController.text,
         description: descriptionController.text,
         dateTime: dateTime,
       );
-      FireBaseService.createEvent(event)
-          .then((_) {
-            Navigator.of(context).pop();
-            UIUtils.showSuccessMessage(context, 'Event added successfully!');
-          })
-          .catchError((error) {
-            // قم بإنشاء رسالة خطأ
-            String errorMessage = 'Something went wrong while adding the event';
-            if (error is FirebaseException) {
-              errorMessage = error.message ?? 'An unexpected error occurred';
-            }
-            // وقم بتمرير الـ context والرسالة للدالة
-            UIUtils.showErrorMessage(context, errorMessage);
-          });
+
+      // Call the FirebaseService method to update the event in Firestore
+      await FireBaseService.updateEvent(updatedEvent);
+
+      // After a successful update, navigate back and pass the updated event
+      Navigator.of(context).pop(updatedEvent);
     }
   }
 }
