@@ -2,6 +2,7 @@ import 'package:evently/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+// ignore: must_be_immutable
 class DefaultTextFormField extends StatefulWidget {
   String hintText;
   TextEditingController? controller;
@@ -11,6 +12,7 @@ class DefaultTextFormField extends StatefulWidget {
   bool isPassword;
 
   DefaultTextFormField({
+    super.key,
     required this.hintText,
     this.controller,
     this.onChanged,

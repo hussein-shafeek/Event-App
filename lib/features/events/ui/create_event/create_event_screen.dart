@@ -7,7 +7,6 @@ import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/core/utils/tab_item.dart';
 import 'package:evently/features/auth/data/ui_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -31,7 +30,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.sizeOf(context).width;
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
 
@@ -215,7 +213,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       );
       FireBaseService.createEvent(event)
           .then((_) {
+            // ignore: use_build_context_synchronously
             Navigator.of(context).pop();
+            // ignore: use_build_context_synchronously
             UIUtils.showSuccessMessage(context, 'Event added successfully!');
           })
           .catchError((error) {
@@ -225,6 +225,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               errorMessage = error.message ?? 'An unexpected error occurred';
             }
             // وقم بتمرير الـ context والرسالة للدالة
+            // ignore: use_build_context_synchronously
             UIUtils.showErrorMessage(context, errorMessage);
           });
     }

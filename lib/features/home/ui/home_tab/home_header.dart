@@ -1,13 +1,13 @@
 import 'package:evently/core/models/category_model.dart';
+import 'package:evently/core/providers/events_provider.dart';
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/core/utils/tab_item.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class HomeHeader extends StatefulWidget {
-  void Function(CategoryModel?) filterEvents;
-  HomeHeader({required this.filterEvents});
+  HomeHeader({super.key});
 
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
@@ -17,7 +17,7 @@ class _HomeHeaderState extends State<HomeHeader> {
   int currentIndex = 0;
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.sizeOf(context).width;
+    EventsProvider eventsProvider = Provider.of<EventsProvider>(context);
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
     return Container(
@@ -54,7 +54,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                       currentIndex == 0
                           ? null
                           : CategoryModel.categories[currentIndex - 1];
-                  widget.filterEvents(selectedCatogry);
+                  eventsProvider.filterEvents(selectedCatogry);
                   setState(() {});
                 },
 

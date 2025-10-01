@@ -4,9 +4,10 @@ import 'package:evently/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class EventItem extends StatelessWidget {
   EventModel event;
-  EventItem(this.event);
+  EventItem(this.event, {super.key});
 
   @override
   Widget build(BuildContext context) {

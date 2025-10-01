@@ -1,6 +1,7 @@
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class TabItem extends StatelessWidget {
   String label;
   IconData icon;
@@ -21,8 +22,8 @@ class TabItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: unused_local_variable
     double width = MediaQuery.sizeOf(context).width;
-    double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
 
     return Container(

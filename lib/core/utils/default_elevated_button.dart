@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class DefaultElevatedButton extends StatelessWidget {
   String label;
   VoidCallback onPressed;
@@ -17,8 +18,8 @@ class DefaultElevatedButton extends StatelessWidget {
     //double height = MediaQuery.sizeOf(context).height;
     return ElevatedButton(
       onPressed: onPressed,
-      child: Text(label, style: text.titleLarge),
       style: ElevatedButton.styleFrom(fixedSize: Size(width, 56)),
+      child: Text(label, style: text.titleLarge),
     );
   }
 }

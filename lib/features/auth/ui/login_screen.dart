@@ -3,8 +3,6 @@ import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/features/auth/data/ui_utils.dart';
-import 'package:evently/features/auth/logic/login_logic.dart';
-import 'package:evently/features/home/ui/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +19,6 @@ class _LoginScreenState extends State<LoginScreen> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.sizeOf(context).width;
     double height = MediaQuery.of(context).size.height;
     TextTheme text = Theme.of(context).textTheme;
     return Scaffold(
@@ -98,8 +95,10 @@ class _LoginScreenState extends State<LoginScreen> {
             password: passwordController.text,
           )
           .then((user) {
+            // ignore: use_build_context_synchronously
             Navigator.of(context).pushReplacementNamed(AppRoutes.homeScreen);
             // لعرض رسالة نجاح بعد تسجيل الدخول
+            // ignore: use_build_context_synchronously
             UIUtils.showSuccessMessage(context, 'Login successful!');
           })
           .catchError((error) {
@@ -108,6 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
               errorMessage = error.message;
             }
             // تمرير الـ context إلى دالة رسالة الخطأ
+            // ignore: use_build_context_synchronously
             UIUtils.showErrorMessage(context, errorMessage);
           });
     }

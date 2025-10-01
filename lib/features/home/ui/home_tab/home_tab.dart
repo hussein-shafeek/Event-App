@@ -1,9 +1,11 @@
 import 'package:evently/core/models/category_model.dart';
 import 'package:evently/core/models/event_models.dart';
+import 'package:evently/core/providers/events_provider.dart';
 import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/utils/event_item.dart';
 import 'package:evently/features/home/ui/home_tab/home_header.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -13,20 +15,14 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-  // 1. إضافة متغير حالة جديد لتتبع الفئة المحددة حالياً
   CategoryModel? _selectedCategory;
-
-  void filterEvents(CategoryModel? category) {
-    // 2. تعديل دالة الفلترة: الآن تقوم فقط بتحديث الفئة المختارة وإعادة بناء الواجهة
-    _selectedCategory = category;
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
+    EventsProvider eventsProvider = Provider.of<EventsProvider>(context);
     return Column(
       children: [
-        HomeHeader(filterEvents: filterEvents),
+        HomeHeader(),
         const SizedBox(height: 16),
         Expanded(
           // 3. استخدام StreamBuilder لجلب البيانات اللحظية
@@ -53,9 +49,11 @@ class _HomeTabState extends State<HomeTab> {
 
                 return ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemBuilder: (_, index) => EventItem(displayedEvents[index]),
+                  itemBuilder:
+                      (_, index) =>
+                          EventItem(eventsProvider.displayedEvents[index]),
                   separatorBuilder: (_, index) => const SizedBox(height: 16),
-                  itemCount: displayedEvents.length,
+                  itemCount: eventsProvider.displayedEvents.length,
                 );
               }
             },

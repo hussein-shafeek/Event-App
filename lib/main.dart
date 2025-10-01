@@ -1,4 +1,5 @@
 import 'package:evently/core/models/event_models.dart';
+import 'package:evently/core/providers/events_provider.dart';
 import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/theme/app_theme.dart';
 import 'package:evently/features/auth/ui/login_screen.dart';
@@ -11,6 +12,7 @@ import 'package:evently/features/onboarding/ui/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:device_preview/device_preview.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // @desc: A global variable to hold the onboarding status.
@@ -33,7 +35,11 @@ Future<void> main() async {
   runApp(
     DevicePreview(
       enabled: false,
-      builder: (context) => EventlyApp(showOnboarding: showOnboarding),
+      builder:
+          (context) => ChangeNotifierProvider(
+            create: (_) => EventsProvider()..getEvents(),
+            child: EventlyApp(showOnboarding: showOnboarding),
+          ),
     ),
   );
 }

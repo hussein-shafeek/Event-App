@@ -10,8 +10,6 @@ class ProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.sizeOf(context).width;
-    double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
 
     // ignore: avoid_unnecessary_containers
@@ -79,9 +77,7 @@ class ProfileTab extends StatelessWidget {
                                   ),
                                 )
                                 .toList(),
-                        onChanged: (value) {
-                          print(value);
-                        },
+                        onChanged: (value) {},
                         borderRadius: BorderRadius.circular(16),
                         underline: SizedBox(),
                         iconEnabledColor: AppColors.primary,
@@ -94,6 +90,7 @@ class ProfileTab extends StatelessWidget {
                   onTap: () {
                     FireBaseService.logout().then((_) {
                       Navigator.of(
+                        // ignore: use_build_context_synchronously
                         context,
                       ).pushReplacementNamed(AppRoutes.loginScreen);
                     });

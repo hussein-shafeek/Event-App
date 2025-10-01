@@ -30,6 +30,4 @@ class UserModel {
       );
 }
 
-extension on JsonCodec {
-  void operator [](String other) {}
-}
+extension on JsonCodec {}
