@@ -1,8 +1,11 @@
 import 'package:evently/core/models/event_models.dart';
+import 'package:evently/core/providers/events_provider.dart';
+import 'package:evently/core/providers/user_provider.dart';
 import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class EventItem extends StatelessWidget {
@@ -11,6 +14,8 @@ class EventItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = Provider.of<UserProvider>(context);
+    bool isFavourite = userProvider.checkIsFavouriteEvent(event.id);
     double width = MediaQuery.sizeOf(context).width;
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
@@ -82,9 +87,23 @@ class EventItem extends StatelessWidget {
                   ),
                   SizedBox(width: 5),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      if (isFavourite) {
+                        userProvider.removeEventFromFavorites(event.id);
+                        Provider.of<EventsProvider>(
+                          context,
+                          listen: false,
+                        ).filterFavouriteEvents(
+                          userProvider.currentUser!.favouriteEventsIds,
+                        );
+                      } else {
+                        userProvider.addEventToFavorites(event.id);
+                      }
+                    },
                     child: Icon(
-                      Icons.favorite_rounded,
+                      isFavourite
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_outline,
                       size: 24,
                       color: AppColors.primary,
                     ),

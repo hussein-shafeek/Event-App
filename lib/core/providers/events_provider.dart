@@ -23,4 +23,10 @@ class EventsProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void filterFavouriteEvents(List<String> favouriteIds) {
+    favouriteEvents =
+        allEvents.where((event) => favouriteIds.contains(event.id)).toList();
+    notifyListeners();
+  }
 }

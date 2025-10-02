@@ -1,6 +1,6 @@
 import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/theme/app_colors.dart';
-import 'package:evently/features/events/ui/love_tab.dart';
+import 'package:evently/features/events/ui/love/love_tab.dart';
 import 'package:evently/features/events/ui/map_tap.dart';
 import 'package:evently/features/events/ui/profile/profile_tab.dart';
 import 'package:evently/features/home/data/nav_bar_icon.dart';
