@@ -1,5 +1,6 @@
 import 'package:evently/core/models/category_model.dart';
 import 'package:evently/core/providers/events_provider.dart';
+import 'package:evently/core/providers/user_provider.dart';
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/core/utils/tab_item.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class _HomeHeaderState extends State<HomeHeader> {
   @override
   Widget build(BuildContext context) {
     EventsProvider eventsProvider = Provider.of<EventsProvider>(context);
+    UserProvider userProvider = Provider.of<UserProvider>(context);
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
     return Container(
@@ -35,7 +37,11 @@ class _HomeHeaderState extends State<HomeHeader> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Welcome Back ✨', style: text.titleSmall),
-            Text('Hussein Shafeek', style: text.headlineSmall),
+            Text(
+              userProvider.currentUser?.name ?? "Loading...",
+              style: text.headlineSmall,
+            ),
+
             SizedBox(height: 16),
 
             DefaultTabController(

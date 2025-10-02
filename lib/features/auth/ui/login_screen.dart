@@ -1,3 +1,4 @@
+import 'package:evently/core/providers/user_provider.dart';
 import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/utils/default_elevated_button.dart';
@@ -5,6 +6,7 @@ import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/features/auth/data/ui_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -95,7 +97,10 @@ class _LoginScreenState extends State<LoginScreen> {
             password: passwordController.text,
           )
           .then((user) {
-            // ignore: use_build_context_synchronously
+            Provider.of<UserProvider>(
+              context,
+              listen: false,
+            ).updateCurrentUser(user);
             Navigator.of(context).pushReplacementNamed(AppRoutes.homeScreen);
             // لعرض رسالة نجاح بعد تسجيل الدخول
             // ignore: use_build_context_synchronously

@@ -49,11 +49,9 @@ class _HomeTabState extends State<HomeTab> {
 
                 return ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemBuilder:
-                      (_, index) =>
-                          EventItem(eventsProvider.displayedEvents[index]),
+                  itemBuilder: (_, index) => EventItem(displayedEvents[index]),
                   separatorBuilder: (_, index) => const SizedBox(height: 16),
-                  itemCount: eventsProvider.displayedEvents.length,
+                  itemCount: displayedEvents.length,
                 );
               }
             },

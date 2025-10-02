@@ -1,9 +1,11 @@
+import 'package:evently/core/providers/user_provider.dart';
 import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/features/events/logic/language_model.dart';
 import 'package:evently/features/events/ui/profile/profile_header.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProfileTab extends StatelessWidget {
   const ProfileTab({super.key});
@@ -11,6 +13,10 @@ class ProfileTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextTheme text = Theme.of(context).textTheme;
+    UserProvider userProvider = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    );
 
     // ignore: avoid_unnecessary_containers
     return Column(

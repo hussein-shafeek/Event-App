@@ -1,5 +1,6 @@
 import 'package:evently/core/models/event_models.dart';
 import 'package:evently/core/providers/events_provider.dart';
+import 'package:evently/core/providers/user_provider.dart';
 import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/theme/app_theme.dart';
 import 'package:evently/features/auth/ui/login_screen.dart';
@@ -36,8 +37,14 @@ Future<void> main() async {
     DevicePreview(
       enabled: false,
       builder:
-          (context) => ChangeNotifierProvider(
-            create: (_) => EventsProvider()..getEvents(),
+          (context) => MultiProvider(
+            providers: [
+              ChangeNotifierProvider(
+                create: (_) => EventsProvider()..getEvents(),
+              ),
+              ChangeNotifierProvider(create: (_) => UserProvider()),
+            ],
+
             child: EventlyApp(showOnboarding: showOnboarding),
           ),
     ),
