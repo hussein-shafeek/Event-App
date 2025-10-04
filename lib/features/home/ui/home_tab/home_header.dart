@@ -1,5 +1,6 @@
 import 'package:evently/core/models/category_model.dart';
 import 'package:evently/core/providers/events_provider.dart';
+import 'package:evently/core/providers/setting_provider.dart';
 import 'package:evently/core/providers/user_provider.dart';
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/core/utils/tab_item.dart';
@@ -20,13 +21,17 @@ class _HomeHeaderState extends State<HomeHeader> {
   Widget build(BuildContext context) {
     EventsProvider eventsProvider = Provider.of<EventsProvider>(context);
     UserProvider userProvider = Provider.of<UserProvider>(context);
+    SettingProvider settingProvider = Provider.of<SettingProvider>(context);
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
     return Container(
       padding: EdgeInsets.only(left: 16, bottom: 16),
       height: height * 0.21,
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color:
+            settingProvider.isDark
+                ? AppColors.backgroundDark
+                : AppColors.primary,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),
@@ -69,9 +74,15 @@ class _HomeHeaderState extends State<HomeHeader> {
                     label: 'All',
                     icon: Icons.all_inbox_outlined,
                     isSelected: currentIndex == 0,
-                    selectedBackgroundColor: AppColors.white,
+                    selectedBackgroundColor:
+                        settingProvider.isDark
+                            ? AppColors.primary
+                            : AppColors.white,
                     unSelectedForgroundColor: AppColors.white,
-                    selectedForgroundColor: AppColors.primary,
+                    selectedForgroundColor:
+                        settingProvider.isDark
+                            ? AppColors.white
+                            : AppColors.primary,
                   ),
                   ...CategoryModel.categories.map(
                     (category) => TabItem(

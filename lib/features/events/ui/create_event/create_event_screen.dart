@@ -1,5 +1,6 @@
 import 'package:evently/core/models/category_model.dart';
 import 'package:evently/core/models/event_models.dart';
+import 'package:evently/core/providers/setting_provider.dart';
 import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/core/utils/default_elevated_button.dart';
@@ -10,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
@@ -32,9 +34,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   Widget build(BuildContext context) {
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
+    SettingProvider settingProvider = Provider.of<SettingProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Create Event')),
+      appBar: AppBar(
+        title: Text('Create Event'),
+        iconTheme: IconThemeData(color: AppColors.primary),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -43,7 +49,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
-                  'assets/images/${selectedCategory.imageName}.png',
+                  settingProvider.isDark
+                      ? 'assets/images/${selectedCategory.imageName}D.png'
+                      : 'assets/images/${selectedCategory.imageName}.png',
                   height: height * 0.23,
                   width: double.infinity,
                   fit: BoxFit.fill,
@@ -77,7 +85,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                 currentIndex ==
                                 CategoryModel.categories.indexOf(category),
                             selectedBackgroundColor: AppColors.primary,
-                            selectedForgroundColor: AppColors.white,
+                            selectedForgroundColor:
+                                settingProvider.isDark
+                                    ? AppColors.black
+                                    : AppColors.white,
                             unSelectedForgroundColor: AppColors.primary,
                           ),
                         )
@@ -120,7 +131,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     SizedBox(height: 16),
                     Row(
                       children: [
-                        SvgPicture.asset('assets/icons/date.svg'),
+                        SvgPicture.asset(
+                          'assets/icons/date.svg',
+                          colorFilter: ColorFilter.mode(
+                            settingProvider.isDark
+                                ? AppColors.white
+                                : AppColors.black,
+                            BlendMode.srcIn,
+                          ),
+                        ),
                         SizedBox(width: 10),
                         Text('Event Date', style: text.titleMedium),
                         Spacer(),
@@ -152,7 +171,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     SizedBox(height: 16),
                     Row(
                       children: [
-                        SvgPicture.asset('assets/icons/time.svg'),
+                        SvgPicture.asset(
+                          'assets/icons/time.svg',
+                          colorFilter: ColorFilter.mode(
+                            settingProvider.isDark
+                                ? AppColors.white
+                                : AppColors.black,
+                            BlendMode.srcIn,
+                          ),
+                        ),
                         SizedBox(width: 10),
                         Text('Event Time', style: text.titleMedium),
                         Spacer(),

@@ -1,3 +1,4 @@
+import 'package:evently/core/providers/setting_provider.dart';
 import 'package:evently/core/providers/user_provider.dart';
 import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/services/firebase.dart';
@@ -12,6 +13,7 @@ class ProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SettingProvider settingProvider = Provider.of<SettingProvider>(context);
     TextTheme text = Theme.of(context).textTheme;
     UserProvider userProvider = Provider.of<UserProvider>(
       context,
@@ -37,12 +39,19 @@ class ProfileTab extends StatelessWidget {
                       'Dark Theme',
                       style: text.titleLarge!.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.black,
+                        color:
+                            settingProvider.isDark
+                                ? AppColors.white
+                                : AppColors.black,
                       ),
                     ),
                     Switch(
-                      value: true,
-                      onChanged: (value) {},
+                      value: settingProvider.isDark,
+                      onChanged: (isDark) {
+                        settingProvider.changeTheme(
+                          isDark ? ThemeMode.dark : ThemeMode.light,
+                        );
+                      },
                       activeTrackColor: AppColors.primary,
                     ),
                   ],
@@ -56,7 +65,10 @@ class ProfileTab extends StatelessWidget {
                       'Language',
                       style: text.titleLarge!.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.black,
+                        color:
+                            settingProvider.isDark
+                                ? AppColors.white
+                                : AppColors.black,
                       ),
                     ),
 

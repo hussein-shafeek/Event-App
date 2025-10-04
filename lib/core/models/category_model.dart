@@ -39,5 +39,36 @@ class CategoryModel {
       name: 'Gaming',
       icon: Icons.games_outlined,
     ),
+
+    CategoryModel(
+      id: 5,
+      imageName: 'book',
+      name: 'Book',
+      icon: Icons.menu_book,
+    ),
+    CategoryModel(
+      id: 6,
+      imageName: 'eating',
+      name: 'Eating',
+      icon: Icons.restaurant,
+    ),
+    CategoryModel(
+      id: 7,
+      imageName: 'exhibition',
+      name: 'Exhibition',
+      icon: Icons.art_track,
+    ),
+    CategoryModel(
+      id: 8,
+      imageName: 'holiday',
+      name: 'Holiday',
+      icon: Icons.beach_access,
+    ),
+    CategoryModel(
+      id: 9,
+      imageName: 'workshop',
+      name: 'Workshop',
+      icon: Icons.handyman,
+    ),
   ];
 }

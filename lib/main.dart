@@ -1,5 +1,6 @@
 import 'package:evently/core/models/event_models.dart';
 import 'package:evently/core/providers/events_provider.dart';
+import 'package:evently/core/providers/setting_provider.dart';
 import 'package:evently/core/providers/user_provider.dart';
 import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/theme/app_theme.dart';
@@ -43,6 +44,7 @@ Future<void> main() async {
                 create: (_) => EventsProvider()..getEvents(),
               ),
               ChangeNotifierProvider(create: (_) => UserProvider()),
+              ChangeNotifierProvider(create: (_) => SettingProvider()),
             ],
 
             child: EventlyApp(showOnboarding: showOnboarding),
@@ -59,6 +61,7 @@ class EventlyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SettingProvider settingProvider = Provider.of<SettingProvider>(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       // @desc: Set the initial route based on the onboarding status.
@@ -66,9 +69,10 @@ class EventlyApp extends StatelessWidget {
           showOnboarding == true
               ? AppRoutes.loginScreen
               : AppRoutes.onboardingScreen,
+
       darkTheme: AppTheme.CustomeDarkTheme,
       theme: AppTheme.CustomeLightTheme,
-      themeMode: ThemeMode.light,
+      themeMode: settingProvider.themeMode,
       routes: {
         AppRoutes.onboardingScreen: (_) => OnboardingScreen(),
         AppRoutes.homeScreen: (_) => HomeScreen(),
