@@ -47,5 +47,15 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<!-- 🗺️ Location Permissions -->
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>This app needs access to your location to show your position on the map.</string>
+
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>This app needs location access even when running in the background for better map experience.</string>
+
+		<key>NSLocationAlwaysUsageDescription</key>
+		<string>This app requires access to your location at all times.</string>
+
 	</dict>
 </plist>

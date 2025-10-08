@@ -4,6 +4,7 @@ import 'package:evently/core/providers/events_provider.dart';
 import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/utils/event_item.dart';
 import 'package:evently/features/home/ui/home_tab/home_header.dart';
+import 'package:evently/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,6 +21,8 @@ class _HomeTabState extends State<HomeTab> {
   @override
   Widget build(BuildContext context) {
     EventsProvider eventsProvider = Provider.of<EventsProvider>(context);
+    final appLocalizations = AppLocalizations.of(context)!;
+    final isRTL = Directionality.of(context) == TextDirection.rtl;
     return Column(
       children: [
         HomeHeader(),
@@ -32,14 +35,13 @@ class _HomeTabState extends State<HomeTab> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
-                return const Center(child: Text('Something went wrong!'));
+                return Center(child: Text(appLocalizations.somethingWrong));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text('No events found.'));
+                return Center(child: Text(appLocalizations.noEventsFound));
               } else {
                 final allEvents = snapshot.data!;
                 List<EventModel> displayedEvents = allEvents;
 
-                // 4. تطبيق منطق الفلتر مباشرة على البيانات التي وصلت من الـ Stream
                 if (_selectedCategory != null) {
                   displayedEvents =
                       allEvents

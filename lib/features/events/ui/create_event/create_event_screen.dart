@@ -7,11 +7,13 @@ import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/core/utils/tab_item.dart';
 import 'package:evently/features/auth/data/ui_utils.dart';
+import 'package:evently/l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:evently/core/utils/localization_helper.dart';
 
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
@@ -32,6 +34,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
     SettingProvider settingProvider = Provider.of<SettingProvider>(context);
@@ -79,7 +83,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     CategoryModel.categories
                         .map(
                           (category) => TabItem(
-                            label: category.name,
+                            label: appLocalizations.translate(
+                              category.translationKey,
+                            ),
                             icon: category.icon,
                             isSelected:
                                 currentIndex ==

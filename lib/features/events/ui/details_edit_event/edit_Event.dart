@@ -4,7 +4,9 @@ import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
+import 'package:evently/core/utils/localization_helper.dart';
 import 'package:evently/core/utils/tab_item.dart';
+import 'package:evently/l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -44,6 +46,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
 
@@ -92,7 +95,9 @@ class _EditEventScreenState extends State<EditEventScreen> {
                     CategoryModel.categories
                         .map(
                           (category) => TabItem(
-                            label: category.name,
+                            label: appLocalizations.translate(
+                              category.translationKey,
+                            ),
                             icon: category.icon,
                             isSelected:
                                 currentIndex ==

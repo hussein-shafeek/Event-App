@@ -5,8 +5,8 @@ class LanguageModel {
   LanguageModel({required this.code, required this.name});
 
   static List<LanguageModel> languages = [
-    LanguageModel(code: 'En', name: 'English'),
-    LanguageModel(code: 'Ar', name: 'العربيه'),
-    LanguageModel(code: 'Fr', name: 'Franch'),
+    LanguageModel(code: 'en', name: 'English'),
+    LanguageModel(code: 'ar', name: 'العربيه'),
+    LanguageModel(code: 'fr', name: 'Franch'),
   ];
 }

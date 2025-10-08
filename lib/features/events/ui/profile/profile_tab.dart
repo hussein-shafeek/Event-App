@@ -5,6 +5,7 @@ import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/features/events/logic/language_model.dart';
 import 'package:evently/features/events/ui/profile/profile_header.dart';
+import 'package:evently/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,30 +14,29 @@ class ProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SettingProvider settingProvider = Provider.of<SettingProvider>(context);
-    TextTheme text = Theme.of(context).textTheme;
-    UserProvider userProvider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
+    final settingProvider = Provider.of<SettingProvider>(context);
+    final text = Theme.of(context).textTheme;
+    final appLocalizations = AppLocalizations.of(context)!;
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final isRTL = Directionality.of(context) == TextDirection.rtl;
 
-    // ignore: avoid_unnecessary_containers
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ProfileHeader(),
-        SizedBox(height: 24),
+        const ProfileHeader(),
+        const SizedBox(height: 24),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                //  تبديل الثيم
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Dark Theme',
+                      appLocalizations.darkTheme, // ← من ملف الترجمة
                       style: text.titleLarge!.copyWith(
                         fontWeight: FontWeight.bold,
                         color:
@@ -56,13 +56,14 @@ class ProfileTab extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
 
+                // 🔹 اختيار اللغة
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Language',
+                      appLocalizations.language, //  من ملف الترجمة
                       style: text.titleLarge!.copyWith(
                         fontWeight: FontWeight.bold,
                         color:
@@ -71,15 +72,14 @@ class ProfileTab extends StatelessWidget {
                                 : AppColors.black,
                       ),
                     ),
-
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 14),
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
                       decoration: BoxDecoration(
                         border: Border.all(color: AppColors.primary),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: DropdownButton(
-                        value: 'En',
+                        value: settingProvider.languageCode,
                         items:
                             LanguageModel.languages
                                 .map(
@@ -95,37 +95,46 @@ class ProfileTab extends StatelessWidget {
                                   ),
                                 )
                                 .toList(),
-                        onChanged: (value) {},
+                        onChanged: (languageCode) {
+                          if (languageCode == null) return;
+                          settingProvider.changrLanguage(languageCode);
+                        },
                         borderRadius: BorderRadius.circular(16),
-                        underline: SizedBox(),
+                        underline: const SizedBox(),
                         iconEnabledColor: AppColors.primary,
                       ),
                     ),
                   ],
                 ),
-                Spacer(),
+
+                const Spacer(),
+
                 InkWell(
                   onTap: () {
                     FireBaseService.logout().then((_) {
                       Navigator.of(
-                        // ignore: use_build_context_synchronously
                         context,
                       ).pushReplacementNamed(AppRoutes.loginScreen);
                     });
                   },
                   child: Container(
-                    margin: EdgeInsets.only(bottom: 35),
-                    padding: EdgeInsets.all(16),
+                    margin: const EdgeInsetsDirectional.only(bottom: 35),
+                    padding: const EdgeInsetsDirectional.all(16),
                     decoration: BoxDecoration(
                       color: AppColors.red,
                       borderRadius: BorderRadius.circular(16),
                     ),
-
                     child: Row(
+                      textDirection:
+                          isRTL ? TextDirection.rtl : TextDirection.ltr,
                       children: [
-                        Icon(Icons.logout, size: 24, color: AppColors.white),
-                        SizedBox(width: 8),
-                        Text('Logout', style: text.titleLarge),
+                        const Icon(
+                          Icons.logout,
+                          size: 24,
+                          color: AppColors.white,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(appLocalizations.logout, style: text.titleLarge),
                       ],
                     ),
                   ),

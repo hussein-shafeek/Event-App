@@ -16,6 +16,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'l10n/app_localizations.dart';
 
 // @desc: A global variable to hold the onboarding status.
 bool? showOnboarding;
@@ -62,6 +63,7 @@ class EventlyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SettingProvider settingProvider = Provider.of<SettingProvider>(context);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       // @desc: Set the initial route based on the onboarding status.
@@ -73,6 +75,10 @@ class EventlyApp extends StatelessWidget {
       darkTheme: AppTheme.CustomeDarkTheme,
       theme: AppTheme.CustomeLightTheme,
       themeMode: settingProvider.themeMode,
+      //localization
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: Locale(settingProvider.languageCode),
       routes: {
         AppRoutes.onboardingScreen: (_) => OnboardingScreen(),
         AppRoutes.homeScreen: (_) => HomeScreen(),
