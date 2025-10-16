@@ -1,5 +1,6 @@
 import 'package:evently/core/models/event_models.dart';
 import 'package:evently/core/providers/events_provider.dart';
+import 'package:evently/core/providers/location_provider.dart';
 import 'package:evently/core/providers/setting_provider.dart';
 import 'package:evently/core/providers/user_provider.dart';
 import 'package:evently/core/routes/routes.dart';
@@ -9,6 +10,7 @@ import 'package:evently/features/auth/ui/register_screen.dart';
 import 'package:evently/features/events/ui/create_event/create_event_screen.dart';
 import 'package:evently/features/events/ui/details_edit_event/details_screen.dart';
 import 'package:evently/features/events/ui/details_edit_event/edit_Event.dart';
+import 'package:evently/features/events/ui/map/location_picker.dart';
 import 'package:evently/features/home/ui/home_screen.dart';
 import 'package:evently/features/onboarding/ui/onboarding_screen.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +48,7 @@ Future<void> main() async {
               ),
               ChangeNotifierProvider(create: (_) => UserProvider()),
               ChangeNotifierProvider(create: (_) => SettingProvider()),
+              ChangeNotifierProvider(create: (context) => LocationProvider()),
             ],
 
             child: EventlyApp(showOnboarding: showOnboarding),
@@ -86,6 +89,7 @@ class EventlyApp extends StatelessWidget {
         AppRoutes.registerScreen: (_) => RegisterScreen(),
         AppRoutes.createEvent: (_) => CreateEventScreen(),
         AppRoutes.detailsScreen: (_) => DetailsScreen(),
+        AppRoutes.locationPicker: (_) => LocationPicker(),
         AppRoutes.editEvent:
             (context) => EditEventScreen(
               event: ModalRoute.of(context)!.settings.arguments as EventModel,
@@ -94,3 +98,4 @@ class EventlyApp extends StatelessWidget {
     );
   }
 }
+//AIzaSyBQR7b5R9LiL9X_RPuZ1oWUxh7dH_nowtQ

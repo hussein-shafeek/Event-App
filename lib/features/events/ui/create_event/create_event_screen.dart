@@ -1,5 +1,6 @@
 import 'package:evently/core/models/category_model.dart';
 import 'package:evently/core/models/event_models.dart';
+import 'package:evently/core/providers/location_provider.dart';
 import 'package:evently/core/providers/setting_provider.dart';
 import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/theme/app_colors.dart';
@@ -7,8 +8,10 @@ import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/core/utils/tab_item.dart';
 import 'package:evently/features/auth/data/ui_utils.dart';
+import 'package:evently/features/events/logic/location_services.dart';
 import 'package:evently/l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -31,6 +34,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   TextEditingController descriptionController = TextEditingController();
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
   DateFormat dateFormat = DateFormat('d/M/yyyy');
+  LatLng? locationLatLng;
+  String? address;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +44,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
     SettingProvider settingProvider = Provider.of<SettingProvider>(context);
+    LocationProvider locationProvider = Provider.of<LocationProvider>(context);
+    locationProvider.userLoccation ??
+        locationProvider.getCurrentLocation(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -212,6 +220,75 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       ],
                     ),
                     SizedBox(height: 24),
+                    Text('Location', style: text.titleMedium),
+                    SizedBox(height: 16),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.all(8),
+                        side: BorderSide(color: AppColors.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      onPressed: () async {
+                        LatLng? locLatLng = await LocationServices.pickLocation(
+                          context,
+                        );
+                        if (locLatLng != null) {
+                          String locAddress =
+                              await LocationServices.getLocationAddress(
+                                context,
+                                locLatLng,
+                              );
+                          setState(() {
+                            locationLatLng = locLatLng;
+                            address = locAddress;
+                          });
+                        }
+                      },
+
+                      child: Row(
+                        //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.gps_fixed,
+                              color: AppColors.white,
+                            ),
+                          ),
+
+                          SizedBox(width: 8),
+                          Expanded(
+                            child:
+                                address != null
+                                    ? Text(
+                                      address!,
+                                      style: text.titleMedium!.copyWith(
+                                        color: AppColors.primary,
+                                      ),
+                                    )
+                                    : Text(
+                                      'Choose Event Location',
+                                      style: text.titleMedium!.copyWith(
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                          ),
+                          SizedBox(width: 8),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: AppColors.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: 16),
                     DefaultElevatedButton(
                       label: 'Add Event',
                       onPressed: createEvent,
@@ -243,6 +320,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         title: titleController.text,
         description: descriptionController.text,
         dateTime: dateTime,
+        lat: locationLatLng!.latitude,
+        long: locationLatLng!.longitude,
+        address: address!,
       );
       FireBaseService.createEvent(event)
           .then((_) {

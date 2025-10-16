@@ -133,7 +133,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 : AppColors.gray,
                       ),
                     );
-                  }).toList(),
+                  }),
 
                   // @desc: Next button or Get Started button.
                   Padding(

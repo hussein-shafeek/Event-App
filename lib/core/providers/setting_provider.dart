@@ -17,4 +17,6 @@ class SettingProvider with ChangeNotifier {
     languageCode = language;
     notifyListeners();
   }
+
+  static void of(BuildContext context, {required bool listen}) {}
 }

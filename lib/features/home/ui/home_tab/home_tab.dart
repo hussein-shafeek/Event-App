@@ -39,15 +39,7 @@ class _HomeTabState extends State<HomeTab> {
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return Center(child: Text(appLocalizations.noEventsFound));
               } else {
-                final allEvents = snapshot.data!;
-                List<EventModel> displayedEvents = allEvents;
-
-                if (_selectedCategory != null) {
-                  displayedEvents =
-                      allEvents
-                          .where((event) => event.category == _selectedCategory)
-                          .toList();
-                }
+                final displayedEvents = eventsProvider.displayedEvents;
 
                 return ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 16),

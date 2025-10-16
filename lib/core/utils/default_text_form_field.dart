@@ -61,8 +61,8 @@ class _DefaultTextFormFieldState extends State<DefaultTextFormField> {
                   },
                   icon: Icon(
                     isObscure
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
                     color:
                         settingProvider.isDark
                             ? AppColors.white

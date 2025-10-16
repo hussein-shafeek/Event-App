@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class HomeHeader extends StatefulWidget {
-  HomeHeader({super.key});
+  const HomeHeader({super.key});
 
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
@@ -73,7 +73,6 @@ class _HomeHeaderState extends State<HomeHeader> {
                             ? null
                             : CategoryModel.categories[currentIndex - 1];
                     eventsProvider.filterEvents(selectedCatogry);
-                    setState(() {});
                   },
 
                   tabs: [
