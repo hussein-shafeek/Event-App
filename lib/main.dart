@@ -4,6 +4,7 @@ import 'package:evently/core/providers/location_provider.dart';
 import 'package:evently/core/providers/setting_provider.dart';
 import 'package:evently/core/providers/user_provider.dart';
 import 'package:evently/core/routes/routes.dart';
+import 'package:evently/core/services/fcm_services.dart';
 import 'package:evently/core/theme/app_theme.dart';
 import 'package:evently/features/auth/ui/login_screen.dart';
 import 'package:evently/features/auth/ui/register_screen.dart';
@@ -13,6 +14,8 @@ import 'package:evently/features/events/ui/details_edit_event/edit_Event.dart';
 import 'package:evently/features/events/ui/map/location_picker.dart';
 import 'package:evently/features/home/ui/home_screen.dart';
 import 'package:evently/features/onboarding/ui/onboarding_screen.dart';
+import 'package:evently/firebase_options.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:device_preview/device_preview.dart';
@@ -22,6 +25,12 @@ import 'l10n/app_localizations.dart';
 
 // @desc: A global variable to hold the onboarding status.
 bool? showOnboarding;
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FcmServices.setupFlutterNotifications();
+  FcmServices.showFlutterNotification(message);
+}
 
 // @desc: The main entry point of the application.
 Future<void> main() async {
@@ -30,6 +39,10 @@ Future<void> main() async {
 
   // @desc: Initialize Firebase.
   await Firebase.initializeApp();
+  FcmServices.printDeviceToken();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  await FcmServices.setupFlutterNotifications();
 
   // @desc: Get an instance of SharedPreferences.
   final prefs = await SharedPreferences.getInstance();
@@ -57,11 +70,22 @@ Future<void> main() async {
   );
 }
 
-class EventlyApp extends StatelessWidget {
+class EventlyApp extends StatefulWidget {
   // @desc: A boolean to check if the onboarding screen has been shown.
   final bool? showOnboarding;
 
   const EventlyApp({super.key, this.showOnboarding});
+
+  @override
+  State<EventlyApp> createState() => _EventlyAppState();
+}
+
+class _EventlyAppState extends State<EventlyApp> {
+  @override
+  void initState() {
+    FirebaseMessaging.onMessage.listen(FcmServices.showFlutterNotification);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +95,7 @@ class EventlyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       // @desc: Set the initial route based on the onboarding status.
       initialRoute:
-          showOnboarding == true
+          widget.showOnboarding == true
               ? AppRoutes.loginScreen
               : AppRoutes.onboardingScreen,
 
