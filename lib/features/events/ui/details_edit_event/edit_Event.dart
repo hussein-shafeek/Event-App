@@ -49,6 +49,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
     final appLocalizations = AppLocalizations.of(context)!;
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
+    var eventModel = ModalRoute.of(context)!.settings.arguments as EventModel;
 
     return Scaffold(
       appBar: AppBar(
@@ -203,7 +204,43 @@ class _EditEventScreenState extends State<EditEventScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Location',
+                      style: text.titleMedium!.copyWith(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.primary),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset('assets/icons/location.svg'),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                eventModel.address ?? '',
+                                style: text.titleMedium!.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
                     DefaultElevatedButton(
                       label: 'Update Event',
                       onPressed: updateEvent,
@@ -227,6 +264,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
         selectedTime.hour,
         selectedTime.minute,
       );
+
+      // ✅ حافظ على القيم القديمة لو المستخدم ما غيّرهاش
       EventModel updatedEvent = EventModel(
         userId: FirebaseAuth.instance.currentUser!.uid,
         id: widget.event.id,
@@ -234,13 +273,16 @@ class _EditEventScreenState extends State<EditEventScreen> {
         title: titleController.text,
         description: descriptionController.text,
         dateTime: dateTime,
+        lat: widget.event.lat, // ✅ أضف الإحداثيات القديمة
+        long: widget.event.long, // ✅ أضف الإحداثيات القديمة
+        address: widget.event.address, // ✅ أضف العنوان القديم
       );
 
-      // Call the FirebaseService method to update the event in Firestore
       await FireBaseService.updateEvent(updatedEvent);
 
-      // After a successful update, navigate back and pass the updated event
-      Navigator.of(context).pop(updatedEvent);
+      if (mounted) {
+        Navigator.of(context).pop(updatedEvent);
+      }
     }
   }
 }

@@ -55,6 +55,11 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
         // أول مرة ممكن ما يكونش في بيانات، اعرض النسخة المبدئية (arguments)
         final event = snapshot.data ?? initialEvent;
+        if (event.lat == null || event.long == null) {
+          return const Scaffold(
+            body: Center(child: Text("Event location not available")),
+          );
+        }
 
         return Scaffold(
           appBar: AppBar(
@@ -263,10 +268,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
       listen: false,
     );
 
-    // امسح أي داير قبل كده
     circles.clear();
 
     for (var event in eventsProvider.allEvents) {
+      // ✅ تجاهل أي event ملوش lat/long
+      if (event.lat == null || event.long == null) continue;
+
       final isCurrentEvent = event.id == initialEvent.id;
 
       circles.add(
