@@ -7,7 +7,8 @@ class EventModel {
   CategoryModel category;
   String title;
   String description;
-  DateTime dateTime;
+  DateTime dateTime; // وقت الحدث نفسه
+  DateTime createdAt; // ✅ وقت الإنشاء الفعلي
   double? long;
   double? lat;
   String? address;
@@ -19,14 +20,15 @@ class EventModel {
     required this.title,
     required this.description,
     required this.dateTime,
+    DateTime? createdAt, // ممكن ما تبعتوش، يتولّد تلقائيًا
     this.address,
     this.lat,
     this.long,
-  });
+  }) : createdAt = createdAt ?? DateTime.now(); // ✅ وقت الإنشاء الافتراضي
 
   factory EventModel.fromJson(Map<String, dynamic> json, String docId) {
     return EventModel(
-      id: docId, //  Use docId, not json['id']
+      id: docId,
       userId: json['userId'] ?? '',
       category: CategoryModel.categories.firstWhere(
         (c) => c.id == json['categoryId'],
@@ -34,7 +36,12 @@ class EventModel {
       ),
       title: json['title'] ?? '',
       description: json['description'] ?? '',
-      dateTime: (json['timestamp'] as Timestamp).toDate(),
+      dateTime:
+          (json['dateTime'] as Timestamp)
+              .toDate(), // 🟢 غيّر الاسم لتوضيح الفرق
+      createdAt:
+          (json['createdAt'] as Timestamp?)?.toDate() ??
+          DateTime.now(), // ✅ جديد
       address: json['address'],
       lat: json['lat'],
       long: json['long'],
@@ -47,7 +54,8 @@ class EventModel {
     'title': title,
     'description': description,
     'categoryId': category.id,
-    'timestamp': Timestamp.fromDate(dateTime),
+    'dateTime': Timestamp.fromDate(dateTime), // 🟢 وقت الحدث
+    'createdAt': Timestamp.fromDate(createdAt), // ✅ وقت الإنشاء
     'address': address,
     'lat': lat,
     'long': long,

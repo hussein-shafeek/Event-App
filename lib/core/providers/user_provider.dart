@@ -1,5 +1,6 @@
 import 'package:evently/core/models/user_model.dart';
 import 'package:evently/core/services/firebase.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class UserProvider with ChangeNotifier {
@@ -26,5 +27,19 @@ class UserProvider with ChangeNotifier {
     FireBaseService.removeEventFromFavorites(eventId);
     currentUser!.favouriteEventsIds.remove(eventId);
     notifyListeners();
+  }
+
+  Future<void> loadCurrentUser() async {
+    if (currentUser == null) {
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      if (firebaseUser != null) {
+        final docSnapshot =
+            await FireBaseService.getUsersCollection()
+                .doc(firebaseUser.uid)
+                .get();
+        currentUser = docSnapshot.data();
+        notifyListeners();
+      }
+    }
   }
 }

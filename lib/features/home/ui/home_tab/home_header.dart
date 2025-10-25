@@ -72,7 +72,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                         currentIndex == 0
                             ? null
                             : CategoryModel.categories[currentIndex - 1];
-                    eventsProvider.filterEvents(selectedCatogry);
+                    eventsProvider.setSelectedCategory(selectedCatogry);
                   },
 
                   tabs: [

@@ -15,16 +15,29 @@ class LoveTab extends StatefulWidget {
 
 class _LoveTabState extends State<LoveTab> {
   late EventsProvider eventsProvider;
+  String searchQuery = "";
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      UserProvider userProvider = Provider.of<UserProvider>(
+        context,
+        listen: false,
+      );
+      EventsProvider eventsProvider = Provider.of<EventsProvider>(
+        context,
+        listen: false,
+      );
+
+      // 🔹 1. Load current user
+      await userProvider.loadCurrentUser();
+
+      // 🔹 2. Load all events
+      await eventsProvider.getEvents();
+
+      // 🔹 3. Filter favourite events
       List<String> favouriteEventIds =
-          Provider.of<UserProvider>(
-            context,
-            listen: false,
-          ).currentUser!.favouriteEventsIds;
+          userProvider.currentUser!.favouriteEventsIds;
       eventsProvider.filterFavouriteEvents(favouriteEventIds);
     });
   }
@@ -45,12 +58,22 @@ class _LoveTabState extends State<LoveTab> {
               DefaultTextFormField(
                 hintText: appLocalizations.searchForEvent,
                 prefixIconImageName: 'search',
-                onChanged: (query) {},
+                onChanged: (query) {
+                  setState(() {
+                    searchQuery = query.toLowerCase();
+                  });
+                },
               ),
               SizedBox(height: 16),
               Expanded(
                 child:
-                    eventsProvider.favouriteEvents.isEmpty
+                    eventsProvider.favouriteEvents
+                            .where(
+                              (event) => event.title.toLowerCase().contains(
+                                searchQuery,
+                              ),
+                            )
+                            .isEmpty
                         ? Center(
                           child: Text(
                             appLocalizations.noFavouriteEvents,
@@ -60,10 +83,23 @@ class _LoveTabState extends State<LoveTab> {
                         : ListView.separated(
                           itemBuilder:
                               (_, index) => EventItem(
-                                eventsProvider.favouriteEvents[index],
+                                eventsProvider.favouriteEvents
+                                    .where(
+                                      (event) => event.title
+                                          .toLowerCase()
+                                          .contains(searchQuery),
+                                    )
+                                    .toList()[index],
                               ),
                           separatorBuilder: (_, index) => SizedBox(height: 16),
-                          itemCount: eventsProvider.favouriteEvents.length,
+                          itemCount:
+                              eventsProvider.favouriteEvents
+                                  .where(
+                                    (event) => event.title
+                                        .toLowerCase()
+                                        .contains(searchQuery),
+                                  )
+                                  .length,
                         ),
               ),
             ],

@@ -1,6 +1,7 @@
 import 'package:evently/core/providers/user_provider.dart';
 import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/services/firebase.dart';
+
 import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/features/auth/data/ui_utils.dart';
@@ -56,7 +57,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: height * 0.01816),
                   DefaultTextFormField(
                     hintText: 'Email',
                     controller: emailController,
@@ -68,7 +69,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: height * 0.01816),
                   DefaultTextFormField(
                     hintText: 'Password',
                     isPassword: true,
@@ -81,12 +82,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: height * 0.02724),
                   DefaultElevatedButton(
                     label: 'Create Account',
                     onPressed: register,
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: height * 0.022701),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

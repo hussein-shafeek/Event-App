@@ -5,6 +5,7 @@ import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/utils/event_item.dart';
 import 'package:evently/features/home/ui/home_tab/home_header.dart';
 import 'package:evently/l10n/app_localizations.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,15 +21,19 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
-    EventsProvider eventsProvider = Provider.of<EventsProvider>(context);
     final appLocalizations = AppLocalizations.of(context)!;
-    final isRTL = Directionality.of(context) == TextDirection.rtl;
+
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Column(
       children: [
         HomeHeader(),
         const SizedBox(height: 16),
         Expanded(
-          // 3. استخدام StreamBuilder لجلب البيانات اللحظية
           child: StreamBuilder<List<EventModel>>(
             stream: FireBaseService.getEventStream(),
             builder: (context, snapshot) {
@@ -39,7 +44,21 @@ class _HomeTabState extends State<HomeTab> {
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return Center(child: Text(appLocalizations.noEventsFound));
               } else {
-                final displayedEvents = eventsProvider.displayedEvents;
+                final eventsProvider = Provider.of<EventsProvider>(context);
+
+                final events = snapshot.data!;
+                final selectedCategory = eventsProvider.selectedCategory;
+
+                final displayedEvents =
+                    selectedCategory == null
+                        ? events
+                        : events
+                            .where((e) => e.category.id == selectedCategory.id)
+                            .toList();
+
+                if (displayedEvents.isEmpty) {
+                  return Center(child: Text(appLocalizations.noEventsFound));
+                }
 
                 return ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
