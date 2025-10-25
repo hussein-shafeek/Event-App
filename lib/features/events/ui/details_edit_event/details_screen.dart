@@ -70,6 +70,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 icon: const Icon(Icons.delete, color: AppColors.red),
                 onPressed: () async {
                   await FireBaseService.deleteEvent(event.id);
+                  // ignore: use_build_context_synchronously
                   if (mounted) Navigator.of(context).pop();
                 },
               ),

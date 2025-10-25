@@ -1,6 +1,5 @@
 import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/theme/app_colors.dart';
-import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/features/onboarding/data/onboarding_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -134,7 +133,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 : AppColors.gray,
                       ),
                     );
-                  }).toList(),
+                  }),
 
                   // @desc: Next button or Get Started button.
                   Padding(

@@ -1,7 +1,10 @@
+import 'package:evently/core/providers/setting_provider.dart';
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class DefaultTextFormField extends StatefulWidget {
   String hintText;
   TextEditingController? controller;
@@ -11,6 +14,7 @@ class DefaultTextFormField extends StatefulWidget {
   bool isPassword;
 
   DefaultTextFormField({
+    super.key,
     required this.hintText,
     this.controller,
     this.onChanged,
@@ -27,9 +31,11 @@ class _DefaultTextFormFieldState extends State<DefaultTextFormField> {
   late bool isObscure = widget.isPassword;
   @override
   Widget build(BuildContext context) {
+    SettingProvider settingProvider = Provider.of<SettingProvider>(context);
     return TextFormField(
       controller: widget.controller,
       onChanged: widget.onChanged,
+      style: Theme.of(context).textTheme.titleMedium,
       decoration: InputDecoration(
         hintText: widget.hintText,
         prefixIcon:
@@ -37,6 +43,11 @@ class _DefaultTextFormFieldState extends State<DefaultTextFormField> {
                 ? null
                 : SvgPicture.asset(
                   'assets/icons/${widget.prefixIconImageName}.svg',
+                  colorFilter: ColorFilter.mode(
+                    settingProvider.isDark ? AppColors.white : AppColors.gray,
+                    BlendMode.srcIn,
+                  ),
+
                   height: 24,
                   width: 24,
                   fit: BoxFit.scaleDown,
@@ -50,9 +61,12 @@ class _DefaultTextFormFieldState extends State<DefaultTextFormField> {
                   },
                   icon: Icon(
                     isObscure
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                    color: AppColors.gray,
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    color:
+                        settingProvider.isDark
+                            ? AppColors.white
+                            : AppColors.gray,
                   ),
                 )
                 : null,

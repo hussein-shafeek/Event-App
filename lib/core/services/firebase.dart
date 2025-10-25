@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evently/core/models/event_models.dart';
 import 'package:evently/core/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rxdart/rxdart.dart';
 
 class FireBaseService {
   static CollectionReference<EventModel> getEventCollection() =>
@@ -9,10 +10,11 @@ class FireBaseService {
           .collection('events')
           .withConverter<EventModel>(
             fromFirestore:
-                (docSnapshot, _) =>
-                    EventModel.fromJson(docSnapshot.data()!, docSnapshot.id),
+                (snapshot, _) =>
+                    EventModel.fromJson(snapshot.data()!, snapshot.id),
             toFirestore: (event, _) => event.toJson(),
           );
+
   static CollectionReference<UserModel> getUsersCollection() =>
       FirebaseFirestore.instance
           .collection('users')
@@ -27,49 +29,74 @@ class FireBaseService {
     final doc = eventCollection.doc();
     event.id = doc.id;
 
-    // Verify that the current user exists.
     final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) {
-      throw Exception("No logged in user");
-    }
+    if (currentUser == null) throw Exception("No logged in user");
 
-    // Associate the event with the userId of the current user.
     event.userId = currentUser.uid;
+    event.createdAt = DateTime.now();
 
     await doc.set(event);
   }
 
   static Future<List<EventModel>> getEvents() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) throw Exception("No user logged in");
+
     final eventCollection = getEventCollection();
-    final querySnapshot = await eventCollection.orderBy('timestamp').get();
-    return querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    try {
+      final querySnapshot =
+          await eventCollection
+              .where('userId', isEqualTo: currentUser.uid)
+              .orderBy('createdAt', descending: true)
+              .get();
+
+      return querySnapshot.docs.map((doc) => doc.data()).toList();
+    } catch (e) {
+      print("⚠️ Error loading events: $e");
+      // fallback في حالة الداتا القديمة مافيهاش createdAt
+      final querySnapshot =
+          await eventCollection
+              .where('userId', isEqualTo: currentUser.uid)
+              .get();
+
+      return querySnapshot.docs.map((doc) => doc.data()).toList();
+    }
   }
 
   static Stream<List<EventModel>> getEventStream() {
-    return getEventCollection().snapshots().map(
-      (querySnapshot) => querySnapshot.docs.map((doc) => doc.data()).toList(),
-    );
+    return FirebaseAuth.instance.authStateChanges().switchMap((user) {
+      if (user == null) {
+        // المستخدم مش داخل => نرجع Stream فاضي لكن ما يقفش
+        return Stream.value([]);
+      }
+
+      return getEventCollection()
+          .where('userId', isEqualTo: user.uid)
+          .orderBy('createdAt', descending: true)
+          .snapshots()
+          .map(
+            (querySnapshot) =>
+                querySnapshot.docs.map((doc) => doc.data()).toList(),
+          );
+    });
   }
 
   static Future<void> deleteEvent(String eventId) async {
     final eventCollection = getEventCollection();
-    final eventDoc = eventCollection.doc(eventId);
-    await eventDoc.delete();
+    await eventCollection.doc(eventId).delete();
   }
 
   static Future<void> updateEvent(EventModel event) async {
     final eventCollection = getEventCollection();
-    final eventDoc = eventCollection.doc(event.id);
-    await eventDoc.set(event);
+    await eventCollection.doc(event.id).update(event.toJson());
   }
 
   static Stream<EventModel?> watchEvent(String id) {
-    // بيراقب الدوكيومنت بتاع الحدث نفسه
-    return getEventCollection()
-        .doc(id)
-        .snapshots()
-        .map((snap) => snap.data()); // EventModel? (ممكن تبقى null لو اتمسح)
+    return getEventCollection().doc(id).snapshots().map((snap) => snap.data());
   }
+
+  // ------------------- USERS -------------------
 
   static Future<UserModel> register({
     required String name,
@@ -122,5 +149,13 @@ class FireBaseService {
     return userDoc.update({
       'favouriteEventsIds': FieldValue.arrayRemove([eventId]),
     });
+  }
+
+  static Future<void> createUser(UserModel user) async {
+    final usersCollection = getUsersCollection();
+    final doc = await usersCollection.doc(user.id).get();
+    if (!doc.exists) {
+      await usersCollection.doc(user.id).set(user);
+    }
   }
 }

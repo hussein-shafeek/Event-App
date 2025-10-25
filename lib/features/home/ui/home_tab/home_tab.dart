@@ -1,9 +1,13 @@
 import 'package:evently/core/models/category_model.dart';
 import 'package:evently/core/models/event_models.dart';
+import 'package:evently/core/providers/events_provider.dart';
 import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/utils/event_item.dart';
 import 'package:evently/features/home/ui/home_tab/home_header.dart';
+import 'package:evently/l10n/app_localizations.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -13,42 +17,47 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-  // 1. إضافة متغير حالة جديد لتتبع الفئة المحددة حالياً
   CategoryModel? _selectedCategory;
-
-  void filterEvents(CategoryModel? category) {
-    // 2. تعديل دالة الفلترة: الآن تقوم فقط بتحديث الفئة المختارة وإعادة بناء الواجهة
-    _selectedCategory = category;
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Column(
       children: [
-        HomeHeader(filterEvents: filterEvents),
+        HomeHeader(),
         const SizedBox(height: 16),
         Expanded(
-          // 3. استخدام StreamBuilder لجلب البيانات اللحظية
           child: StreamBuilder<List<EventModel>>(
             stream: FireBaseService.getEventStream(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
-                return const Center(child: Text('Something went wrong!'));
+                return Center(child: Text(appLocalizations.somethingWrong));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text('No events found.'));
+                return Center(child: Text(appLocalizations.noEventsFound));
               } else {
-                final allEvents = snapshot.data!;
-                List<EventModel> displayedEvents = allEvents;
+                final eventsProvider = Provider.of<EventsProvider>(context);
 
-                // 4. تطبيق منطق الفلتر مباشرة على البيانات التي وصلت من الـ Stream
-                if (_selectedCategory != null) {
-                  displayedEvents =
-                      allEvents
-                          .where((event) => event.category == _selectedCategory)
-                          .toList();
+                final events = snapshot.data!;
+                final selectedCategory = eventsProvider.selectedCategory;
+
+                final displayedEvents =
+                    selectedCategory == null
+                        ? events
+                        : events
+                            .where((e) => e.category.id == selectedCategory.id)
+                            .toList();
+
+                if (displayedEvents.isEmpty) {
+                  return Center(child: Text(appLocalizations.noEventsFound));
                 }
 
                 return ListView.separated(

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class OnboardingModel {
   // @desc: The image asset name for the onboarding page.
   final String image;
