@@ -10,7 +10,7 @@ class SettingProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void changrLanguage(String language) {
+  void changeLanguage(String language) {
     if (languageCode == language) return;
     languageCode = language;
     notifyListeners();
