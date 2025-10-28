@@ -47,6 +47,9 @@ Future<void> main() async {
   // @desc: Get an instance of SharedPreferences.
   final prefs = await SharedPreferences.getInstance();
 
+  // هيتمسح بعدين
+  // await prefs.remove('onboarding_shown');
+
   // @desc: Check if the 'onboarding_shown' key exists. If it's null (first time), it defaults to false.
   showOnboarding = prefs.getBool('onboarding_shown') ?? false;
 
@@ -94,11 +97,10 @@ class _EventlyAppState extends State<EventlyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       // @desc: Set the initial route based on the onboarding status.
-      initialRoute:
+      initialRoute: // AppRoutes.onboardingScreen,
           widget.showOnboarding == true
               ? AppRoutes.loginScreen
               : AppRoutes.onboardingScreen,
-
       darkTheme: AppTheme.CustomeDarkTheme,
       theme: AppTheme.CustomeLightTheme,
       themeMode: settingProvider.themeMode,

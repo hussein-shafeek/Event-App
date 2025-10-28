@@ -8,6 +8,7 @@ import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/core/utils/tab_item.dart';
 import 'package:evently/features/auth/data/ui_utils.dart';
+import 'package:evently/features/events/logic/create_event_logic.dart';
 import 'package:evently/features/events/logic/location_services.dart';
 import 'package:evently/l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,7 +41,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
-
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
     SettingProvider settingProvider = Provider.of<SettingProvider>(context);
@@ -50,8 +50,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Event'),
-        iconTheme: IconThemeData(color: AppColors.primary),
+        title: Text(appLocalizations.createEvent),
+        iconTheme: const IconThemeData(color: AppColors.primary),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -70,7 +70,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 ),
               ),
             ),
-
             DefaultTabController(
               length: CategoryModel.categories.length,
               child: TabBar(
@@ -80,13 +79,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   selectedCategory = CategoryModel.categories[currentIndex];
                   setState(() {});
                 },
-
                 isScrollable: true,
                 indicatorColor: Colors.transparent,
                 dividerColor: Colors.transparent,
                 tabAlignment: TabAlignment.start,
-                labelPadding: EdgeInsets.only(right: 10),
-                padding: EdgeInsets.only(left: 16),
+                labelPadding: const EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.only(left: 16),
                 tabs:
                     CategoryModel.categories
                         .map(
@@ -116,33 +114,33 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Title", style: text.titleMedium),
-                    SizedBox(height: 8),
+                    Text(appLocalizations.title, style: text.titleMedium),
+                    const SizedBox(height: 8),
                     DefaultTextFormField(
-                      hintText: 'Event Title',
+                      hintText: appLocalizations.eventTitle,
                       prefixIconImageName: 'title',
                       controller: titleController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return "Title can not be empty";
+                          return appLocalizations.titleEmpty;
                         }
                         return null;
                       },
                     ),
-                    SizedBox(height: 16),
-                    Text("Description", style: text.titleMedium),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 16),
+                    Text(appLocalizations.description, style: text.titleMedium),
+                    const SizedBox(height: 8),
                     DefaultTextFormField(
-                      hintText: 'Event Description',
+                      hintText: appLocalizations.eventDescription,
                       controller: descriptionController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return "Description can not be empty";
+                          return appLocalizations.descriptionEmpty;
                         }
                         return null;
                       },
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Row(
                       children: [
                         SvgPicture.asset(
@@ -154,15 +152,20 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                             BlendMode.srcIn,
                           ),
                         ),
-                        SizedBox(width: 10),
-                        Text('Event Date', style: text.titleMedium),
-                        Spacer(),
+                        const SizedBox(width: 10),
+                        Text(
+                          appLocalizations.eventDate,
+                          style: text.titleMedium,
+                        ),
+                        const Spacer(),
                         InkWell(
                           onTap: () async {
                             DateTime? date = await showDatePicker(
                               context: context,
                               firstDate: DateTime.now(),
-                              lastDate: DateTime.now().add(Duration(days: 365)),
+                              lastDate: DateTime.now().add(
+                                const Duration(days: 365),
+                              ),
                               initialEntryMode:
                                   DatePickerEntryMode.calendarOnly,
                             );
@@ -173,7 +176,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           },
                           child: Text(
                             selectedDate == null
-                                ? 'Select Date'
+                                ? appLocalizations.selectDate
                                 : dateFormat.format(selectedDate!),
                             style: text.titleMedium!.copyWith(
                               color: AppColors.primary,
@@ -182,7 +185,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Row(
                       children: [
                         SvgPicture.asset(
@@ -194,9 +197,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                             BlendMode.srcIn,
                           ),
                         ),
-                        SizedBox(width: 10),
-                        Text('Event Time', style: text.titleMedium),
-                        Spacer(),
+                        const SizedBox(width: 10),
+                        Text(
+                          appLocalizations.eventTime,
+                          style: text.titleMedium,
+                        ),
+                        const Spacer(),
                         InkWell(
                           onTap: () async {
                             TimeOfDay? time = await showTimePicker(
@@ -210,7 +216,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           },
                           child: Text(
                             selectedTime == null
-                                ? 'Select Time'
+                                ? appLocalizations.selectTime
                                 : selectedTime!.format(context),
                             style: text.titleMedium!.copyWith(
                               color: AppColors.primary,
@@ -219,13 +225,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 24),
-                    Text('Location', style: text.titleMedium),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 24),
+                    Text(appLocalizations.location, style: text.titleMedium),
+                    const SizedBox(height: 16),
                     OutlinedButton(
                       style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.all(8),
-                        side: BorderSide(color: AppColors.primary),
+                        padding: const EdgeInsets.all(8),
+                        side: const BorderSide(color: AppColors.primary),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -246,23 +252,20 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           });
                         }
                       },
-
                       child: Row(
-                        //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            padding: EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               color: AppColors.primary,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(
+                            child: const Icon(
                               Icons.gps_fixed,
                               color: AppColors.white,
                             ),
                           ),
-
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Expanded(
                             child:
                                 address != null
@@ -273,25 +276,36 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                       ),
                                     )
                                     : Text(
-                                      'Choose Event Location',
+                                      appLocalizations.chooseLocation,
                                       style: text.titleMedium!.copyWith(
                                         color: AppColors.primary,
                                       ),
                                     ),
                           ),
-                          SizedBox(width: 8),
-                          Icon(
+                          const SizedBox(width: 8),
+                          const Icon(
                             Icons.arrow_forward_ios,
                             color: AppColors.primary,
                           ),
                         ],
                       ),
                     ),
-
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     DefaultElevatedButton(
-                      label: 'Add Event',
-                      onPressed: createEvent,
+                      label: appLocalizations.addEvent,
+                      onPressed: () {
+                        CreateEventLogic.createEvent(
+                          context: context,
+                          formKey: formkey,
+                          selectedCategory: selectedCategory,
+                          titleController: titleController,
+                          descriptionController: descriptionController,
+                          selectedDate: selectedDate,
+                          selectedTime: selectedTime,
+                          locationLatLng: locationLatLng,
+                          address: address,
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -301,46 +315,5 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         ),
       ),
     );
-  }
-
-  void createEvent() {
-    if (formkey.currentState!.validate() &&
-        selectedDate != null &&
-        selectedTime != null) {
-      DateTime dateTime = DateTime(
-        selectedDate!.year,
-        selectedDate!.month,
-        selectedDate!.day,
-        selectedTime!.hour,
-        selectedTime!.minute,
-      );
-      EventModel event = EventModel(
-        userId: FirebaseAuth.instance.currentUser!.uid,
-        category: selectedCategory,
-        title: titleController.text,
-        description: descriptionController.text,
-        dateTime: dateTime,
-        lat: locationLatLng!.latitude,
-        long: locationLatLng!.longitude,
-        address: address!,
-      );
-      FireBaseService.createEvent(event)
-          .then((_) {
-            // ignore: use_build_context_synchronously
-            Navigator.of(context).pop();
-            // ignore: use_build_context_synchronously
-            UIUtils.showSuccessMessage(context, 'Event added successfully!');
-          })
-          .catchError((error) {
-            // قم بإنشاء رسالة خطأ
-            String errorMessage = 'Something went wrong while adding the event';
-            if (error is FirebaseException) {
-              errorMessage = error.message ?? 'An unexpected error occurred';
-            }
-            // وقم بتمرير الـ context والرسالة للدالة
-            // ignore: use_build_context_synchronously
-            UIUtils.showErrorMessage(context, errorMessage);
-          });
-    }
   }
 }

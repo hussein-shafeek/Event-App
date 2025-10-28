@@ -5,6 +5,8 @@ import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/features/auth/data/ui_utils.dart';
+import 'package:evently/features/auth/logic/register_logic.dart';
+import 'package:evently/l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -47,57 +50,66 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 24),
                   DefaultTextFormField(
-                    hintText: 'Name',
+                    hintText: t.name,
                     controller: nameController,
                     prefixIconImageName: 'person',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Name is required';
+                        return t.nameRequired;
                       }
                       return null;
                     },
                   ),
                   SizedBox(height: height * 0.01816),
                   DefaultTextFormField(
-                    hintText: 'Email',
+                    hintText: t.email,
                     controller: emailController,
                     prefixIconImageName: 'Email',
                     validator: (value) {
                       if (value == null || value.length < 5) {
-                        return 'Enter a valid email';
+                        return t.emailInvalid;
                       }
                       return null;
                     },
                   ),
                   SizedBox(height: height * 0.01816),
                   DefaultTextFormField(
-                    hintText: 'Password',
+                    hintText: t.password,
                     isPassword: true,
                     controller: passwordController,
                     prefixIconImageName: 'lock',
                     validator: (value) {
                       if (value == null || value.length < 8) {
-                        return 'Password must be at least 8 characters';
+                        return t.passwordTooShort;
                       }
                       return null;
                     },
                   ),
                   SizedBox(height: height * 0.02724),
                   DefaultElevatedButton(
-                    label: 'Create Account',
-                    onPressed: register,
+                    label: t.createAccount,
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        RegisterLogic.register(
+                          context: context,
+                          name: nameController.text,
+                          email: emailController.text,
+                          password: passwordController.text,
+                        );
+                      }
+                    },
                   ),
                   SizedBox(height: height * 0.022701),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Already Have Account ?', style: text.titleMedium),
+                      Text(t.alreadyHaveAccount, style: text.titleMedium),
                       TextButton(
                         onPressed:
                             () => Navigator.of(
                               context,
                             ).pushReplacementNamed(AppRoutes.loginScreen),
-                        child: const Text('Login'),
+                        child: Text(t.login),
                       ),
                     ],
                   ),
@@ -108,29 +120,5 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
-  }
-
-  void register() {
-    if (formKey.currentState!.validate()) {
-      FireBaseService.register(
-            name: nameController.text,
-            email: emailController.text,
-            password: passwordController.text,
-          )
-          .then((user) {
-            Provider.of<UserProvider>(
-              context,
-              listen: false,
-            ).updateCurrentUser(user);
-            Navigator.of(context).pushReplacementNamed(AppRoutes.homeScreen);
-          })
-          .catchError((error) {
-            String? errorMessage;
-            if (error is FirebaseAuthException) {
-              errorMessage = error.message;
-            }
-            UIUtils.showErrorMessage(context, errorMessage);
-          });
-    }
   }
 }

@@ -1,18 +1,21 @@
 import 'package:evently/core/models/event_models.dart';
 import 'package:evently/core/providers/setting_provider.dart';
 import 'package:evently/core/theme/app_colors.dart';
+import 'package:evently/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
 
 class MapEventItem extends StatelessWidget {
-  EventModel event;
-  MapEventItem({super.key, required this.event});
+  final EventModel event;
+  const MapEventItem({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-    SettingProvider settingProvider = Provider.of<SettingProvider>(context);
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    final settingProvider = Provider.of<SettingProvider>(context);
+    final lang = AppLocalizations.of(context)!;
 
     return Container(
       margin: EdgeInsetsDirectional.symmetric(vertical: height * 0.02).copyWith(
@@ -59,10 +62,10 @@ class MapEventItem extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Icon(Icons.location_on_outlined),
+                    const Icon(Icons.location_on_outlined),
                     Expanded(
                       child: Text(
-                        event.address ?? 'No Address Found',
+                        event.address ?? lang.eventLocationNotAvailable,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         softWrap: true,

@@ -13,22 +13,30 @@ class ProfileHeader extends StatelessWidget {
     final height = MediaQuery.sizeOf(context).height;
     final text = Theme.of(context).textTheme;
     final userProvider = Provider.of<UserProvider>(context);
-    final appLocalizations = AppLocalizations.of(context)!;
+    final t = AppLocalizations.of(context)!;
     final isRTL = Directionality.of(context) == TextDirection.rtl;
+
+    final String userName =
+        userProvider.currentUser?.name?.isNotEmpty == true
+            ? userProvider.currentUser!.name
+            : t.name; // 🔹 لو مفيش اسم يظهر النص المترجم "الاسم"
+
+    final String userEmail =
+        userProvider.currentUser?.email?.isNotEmpty == true
+            ? userProvider.currentUser!.email
+            : t.email; // 🔹 لو مفيش إيميل يظهر النص المترجم "البريد الإلكتروني"
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.only(
-          //  الانحناء بيتغير حسب الاتجاه
           bottomLeft: isRTL ? Radius.zero : const Radius.circular(64),
           bottomRight: isRTL ? const Radius.circular(64) : Radius.zero,
         ),
       ),
       child: SafeArea(
         child: Row(
-          //  بنحدد اتجاه الـ Row نفسه
           textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
           children: [
             Transform(
@@ -42,19 +50,15 @@ class ProfileHeader extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-
             Expanded(
               child: Column(
                 crossAxisAlignment:
                     isRTL ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    userProvider.currentUser?.name ?? '',
-                    style: text.headlineSmall,
-                  ),
+                  Text(userName, style: text.headlineSmall),
                   const SizedBox(height: 10),
                   Text(
-                    userProvider.currentUser?.email ?? '',
+                    userEmail,
                     style: text.titleMedium!.copyWith(color: AppColors.white),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

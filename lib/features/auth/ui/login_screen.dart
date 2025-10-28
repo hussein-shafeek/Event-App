@@ -8,6 +8,8 @@ import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/core/utils/dialog_custom.dart';
 import 'package:evently/features/auth/data/ui_utils.dart';
+import 'package:evently/features/auth/logic/login_logic.dart';
+import 'package:evently/l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     TextTheme text = Theme.of(context).textTheme;
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -47,33 +50,42 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: height * 0.027241),
                   DefaultTextFormField(
-                    hintText: 'Email',
+                    hintText: t.email,
                     controller: emailController,
                     prefixIconImageName: 'Email',
                     validator: (value) {
                       if (value == null || value.length < 5) {
-                        return 'Invalid email';
+                        return t.somethingWrong;
                       }
                       return null;
                     },
                   ),
                   SizedBox(height: height * 0.01816),
                   DefaultTextFormField(
-                    hintText: 'Password',
+                    hintText: t.password,
                     isPassword: true,
                     controller: passwordController,
                     prefixIconImageName: 'lock',
                     validator: (value) {
                       if (value == null || value.length < 8) {
-                        return 'Password must be at least 8 characters';
+                        return t.passwordTooShort;
                       }
                       return null;
                     },
                   ),
                   SizedBox(height: height * 0.027241),
                   DefaultElevatedButton(
-                    label: 'Login',
-                    onPressed: login,
+                    label: t.login,
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        LoginLogic.login(
+                          context: context,
+                          email: emailController.text,
+                          password: passwordController.text,
+                        );
+                      }
+                    },
+
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.white,
                   ),
@@ -81,13 +93,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Don’t Have Account ?', style: text.titleMedium),
+                      Text(
+                        AppLocalizations.of(context)!.noAccount,
+                        style: text.titleMedium,
+                      ),
+
                       TextButton(
                         onPressed:
                             () => Navigator.of(
                               context,
                             ).pushReplacementNamed(AppRoutes.registerScreen),
-                        child: Text('Create Account'),
+                        child: Text(t.createAccount),
                       ),
                     ],
                   ),
@@ -103,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       Text(
-                        'Or',
+                        t.or,
                         style: text.titleMedium!.copyWith(
                           color: AppColors.primary,
                         ),
@@ -120,12 +136,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: height * 0.0227),
                   DefaultElevatedButton(
-                    label: 'Login With Google',
+                    label: t.loginWithGoogle,
                     backgroundColor: AppColors.backgroundDark,
                     prefixSvgPath: 'assets/icons/google.svg',
-                    onPressed: () async {
-                      logWithGoogle(context);
-                    },
+                    onPressed: () => LoginLogic.loginWithGoogle(context),
                   ),
                 ],
               ),
@@ -134,117 +148,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-  }
-
-  void login() {
-    if (formKey.currentState!.validate()) {
-      FireBaseService.login(
-            email: emailController.text,
-            password: passwordController.text,
-          )
-          .then((user) {
-            Provider.of<UserProvider>(
-              context,
-              listen: false,
-            ).updateCurrentUser(user);
-            Navigator.of(context).pushReplacementNamed(AppRoutes.homeScreen);
-            // لعرض رسالة نجاح بعد تسجيل الدخول
-            // ignore: use_build_context_synchronously
-            UIUtils.showSuccessMessage(context, 'Login successful!');
-          })
-          .catchError((error) {
-            String? errorMessage;
-            if (error is FirebaseAuthException) {
-              errorMessage = error.message;
-            }
-            // تمرير الـ context إلى دالة رسالة الخطأ
-            // ignore: use_build_context_synchronously
-            UIUtils.showErrorMessage(context, errorMessage);
-          });
-    }
-  }
-
-  Future<UserCredential?> logWithGoogle(BuildContext context) async {
-    try {
-      final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
-
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-
-      if (googleUser == null) {
-        showCustomMessage(
-          context: context,
-          title: 'Login Failed',
-          message: 'Google sign-in was cancelled. Please try again.',
-          actionText: 'OK',
-          icon: Icons.warning_amber_rounded,
-          iconColor: Colors.orange,
-        );
-        return null;
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithCredential(credential);
-
-      UserModel userModel = UserModel(
-        id: userCredential.user!.uid,
-        name: userCredential.user!.displayName ?? '',
-        email: userCredential.user!.email ?? '',
-        favouriteEventsIds: [],
-      );
-      // حفظ المستخدم في الفايرستور لو جديد
-      await FireBaseService.createUser(userModel);
-
-      // تحديث المستخدم الحالي في البروفايدر
-      Provider.of<UserProvider>(
-        context,
-        listen: false,
-      ).updateCurrentUser(userModel);
-
-      //  تحديث الـ UserProvider
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      userProvider.updateCurrentUser(userModel);
-
-      //  تحميل كل الأحداث من Firestore
-      final eventsProvider = Provider.of<EventsProvider>(
-        context,
-        listen: false,
-      );
-      await eventsProvider.getEvents();
-
-      //  فلترة الأحداث المفضلة
-      eventsProvider.filterFavouriteEvents(userModel.favouriteEventsIds);
-
-      //  الانتقال إلى الشاشة الرئيسية
-      Navigator.of(context).pushReplacementNamed(AppRoutes.homeScreen);
-      showCustomMessage(
-        context: context,
-        title: 'Success',
-        message: 'You have successfully signed in with Google!',
-        actionText: 'OK',
-        icon: Icons.check_circle_outline,
-        iconColor: Colors.green,
-      );
-
-      return userCredential;
-    } catch (e) {
-      print('Google Sign-In Error: $e');
-      showCustomMessage(
-        context: context,
-        title: 'Error',
-        message: 'An error occurred during sign-in: $e',
-        actionText: 'OK',
-        icon: Icons.error_outline,
-        iconColor: Colors.red,
-      );
-      return null;
-    }
   }
 }

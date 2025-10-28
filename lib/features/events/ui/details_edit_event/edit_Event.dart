@@ -6,6 +6,7 @@ import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/core/utils/localization_helper.dart';
 import 'package:evently/core/utils/tab_item.dart';
+import 'package:evently/features/events/logic/edit_event_logic.dart';
 import 'package:evently/l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,6 @@ class _EditEventScreenState extends State<EditEventScreen> {
   @override
   void initState() {
     super.initState();
-    // 1. ملء البيانات القديمة
     currentIndex = CategoryModel.categories.indexOf(widget.event.category);
     selectedCategory = widget.event.category;
     selectedDate = widget.event.dateTime;
@@ -53,12 +53,9 @@ class _EditEventScreenState extends State<EditEventScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Event'),
+        title: Text(appLocalizations.editEvent),
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: AppColors.primary, // تم تعديل هذا السطر
-          ),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -118,28 +115,28 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Title", style: text.titleMedium),
+                    Text(appLocalizations.title, style: text.titleMedium),
                     const SizedBox(height: 8),
                     DefaultTextFormField(
-                      hintText: 'Event Title',
+                      hintText: appLocalizations.eventTitle,
                       prefixIconImageName: 'title',
                       controller: titleController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return "Title can not be empty";
+                          return appLocalizations.titleEmpty;
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 16),
-                    Text("Description", style: text.titleMedium),
+                    Text(appLocalizations.description, style: text.titleMedium),
                     const SizedBox(height: 8),
                     DefaultTextFormField(
-                      hintText: 'Event Description',
+                      hintText: appLocalizations.eventDescription,
                       controller: descriptionController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return "Description can not be empty";
+                          return appLocalizations.descriptionEmpty;
                         }
                         return null;
                       },
@@ -149,7 +146,10 @@ class _EditEventScreenState extends State<EditEventScreen> {
                       children: [
                         SvgPicture.asset('assets/icons/date.svg'),
                         const SizedBox(width: 10),
-                        Text('Event Date', style: text.titleMedium),
+                        Text(
+                          appLocalizations.eventDateLabel,
+                          style: text.titleMedium,
+                        ),
                         const Spacer(),
                         InkWell(
                           onTap: () async {
@@ -182,7 +182,10 @@ class _EditEventScreenState extends State<EditEventScreen> {
                       children: [
                         SvgPicture.asset('assets/icons/time.svg'),
                         const SizedBox(width: 10),
-                        Text('Event Time', style: text.titleMedium),
+                        Text(
+                          appLocalizations.eventTimeLabel,
+                          style: text.titleMedium,
+                        ),
                         const Spacer(),
                         InkWell(
                           onTap: () async {
@@ -206,7 +209,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Location',
+                      appLocalizations.locationLabel,
                       style: text.titleMedium!.copyWith(
                         color: AppColors.white,
                         fontWeight: FontWeight.w800,
@@ -228,7 +231,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
                               child: Text(
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                eventModel.address ?? '',
+                                eventModel.address ??
+                                    appLocalizations.eventLocationNotAvailable,
                                 style: text.titleMedium!.copyWith(
                                   color: AppColors.primary,
                                   fontWeight: FontWeight.w500,
@@ -240,10 +244,20 @@ class _EditEventScreenState extends State<EditEventScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-
                     DefaultElevatedButton(
-                      label: 'Update Event',
-                      onPressed: updateEvent,
+                      label: appLocalizations.updateEvent,
+                      onPressed: () {
+                        EditEventLogic.updateEvent(
+                          context: context,
+                          formKey: formkey,
+                          oldEvent: widget.event,
+                          selectedDate: selectedDate,
+                          selectedTime: selectedTime,
+                          title: titleController.text,
+                          description: descriptionController.text,
+                          category: selectedCategory,
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -255,34 +269,33 @@ class _EditEventScreenState extends State<EditEventScreen> {
     );
   }
 
-  void updateEvent() async {
-    if (formkey.currentState!.validate()) {
-      DateTime dateTime = DateTime(
-        selectedDate.year,
-        selectedDate.month,
-        selectedDate.day,
-        selectedTime.hour,
-        selectedTime.minute,
-      );
+  // void updateEvent() async {
+  //   if (formkey.currentState!.validate()) {
+  //     DateTime dateTime = DateTime(
+  //       selectedDate.year,
+  //       selectedDate.month,
+  //       selectedDate.day,
+  //       selectedTime.hour,
+  //       selectedTime.minute,
+  //     );
 
-      // ✅ حافظ على القيم القديمة لو المستخدم ما غيّرهاش
-      EventModel updatedEvent = EventModel(
-        userId: FirebaseAuth.instance.currentUser!.uid,
-        id: widget.event.id,
-        category: selectedCategory,
-        title: titleController.text,
-        description: descriptionController.text,
-        dateTime: dateTime,
-        lat: widget.event.lat, // ✅ أضف الإحداثيات القديمة
-        long: widget.event.long, // ✅ أضف الإحداثيات القديمة
-        address: widget.event.address, // ✅ أضف العنوان القديم
-      );
+  //     EventModel updatedEvent = EventModel(
+  //       userId: FirebaseAuth.instance.currentUser!.uid,
+  //       id: widget.event.id,
+  //       category: selectedCategory,
+  //       title: titleController.text,
+  //       description: descriptionController.text,
+  //       dateTime: dateTime,
+  //       lat: widget.event.lat,
+  //       long: widget.event.long,
+  //       address: widget.event.address,
+  //     );
 
-      await FireBaseService.updateEvent(updatedEvent);
+  //     await FireBaseService.updateEvent(updatedEvent);
 
-      if (mounted) {
-        Navigator.of(context).pop(updatedEvent);
-      }
-    }
-  }
+  //     if (mounted) {
+  //       Navigator.of(context).pop(updatedEvent);
+  //     }
+  //   }
+  // }
 }

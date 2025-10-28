@@ -4,6 +4,8 @@ import 'package:evently/core/providers/location_provider.dart';
 import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/theme/app_colors.dart';
+import 'package:evently/features/events/logic/details_logic.dart';
+import 'package:evently/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -20,20 +22,21 @@ class DetailsScreen extends StatefulWidget {
 class _DetailsScreenState extends State<DetailsScreen> {
   Set<Circle> circles = {};
   GoogleMapController? mapController;
-  late EventModel initialEvent; // بناخدها مرّة من arguments
+  late EventModel initialEvent;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     initialEvent = ModalRoute.of(context)!.settings.arguments as EventModel;
-    _initCircles();
+    circles = DetailsLogic.initCircles(context, initialEvent);
   }
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
     final text = Theme.of(context).textTheme;
-    final formatter = DateFormat('dd MMMM yyyy, hh:mm a');
+    final appLocalizations = AppLocalizations.of(context)!;
+
     EventsProvider eventsProvider = Provider.of<EventsProvider>(context);
     var eventModel = ModalRoute.of(context)!.settings.arguments as EventModel;
     LocationProvider locationProvider = Provider.of<LocationProvider>(context);
@@ -44,26 +47,26 @@ class _DetailsScreenState extends State<DetailsScreen> {
     return StreamBuilder<EventModel?>(
       stream: FireBaseService.watchEvent(initialEvent.id),
       builder: (context, snapshot) {
-        // لو الدوك اتعمله delete نرجع للشاشة اللي قبلها
         if (snapshot.hasData && snapshot.data == null) {
-          // اتأكد إننا على فريم بعد البناء
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) Navigator.pop(context);
           });
           return const SizedBox.shrink();
         }
 
-        // أول مرة ممكن ما يكونش في بيانات، اعرض النسخة المبدئية (arguments)
         final event = snapshot.data ?? initialEvent;
+
         if (event.lat == null || event.long == null) {
-          return const Scaffold(
-            body: Center(child: Text("Event location not available")),
+          return Scaffold(
+            body: Center(
+              child: Text(appLocalizations.eventLocationNotAvailable),
+            ),
           );
         }
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Event Details'),
+            title: Text(appLocalizations.eventDetails),
             leading: IconButton(
               icon: const Icon(
                 Icons.arrow_back_ios_new,
@@ -74,21 +77,20 @@ class _DetailsScreenState extends State<DetailsScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
+                tooltip: appLocalizations.editEvent,
                 onPressed: () async {
-                  // نبعت أحدث نسخة للـ Edit
                   await Navigator.pushNamed(
                     context,
                     AppRoutes.editEvent,
                     arguments: event,
                   );
-                  // مش محتاجين setState.. الـ Stream هيحدّث لوحده
                 },
               ),
               IconButton(
                 icon: const Icon(Icons.delete, color: AppColors.red),
+                tooltip: appLocalizations.deleteEvent,
                 onPressed: () async {
                   await FireBaseService.deleteEvent(event.id);
-                  // ignore: use_build_context_synchronously
                   if (mounted) Navigator.of(context).pop();
                 },
               ),
@@ -110,6 +112,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+
                   Text(
                     event.title,
                     style: text.headlineSmall!.copyWith(
@@ -118,6 +121,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
@@ -133,7 +137,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                DateFormat('d MMMM yyy').format(event.dateTime),
+                                DateFormat(
+                                  'd MMMM yyyy',
+                                ).format(event.dateTime),
                                 style: text.titleMedium!.copyWith(
                                   color: AppColors.primary,
                                   fontWeight: FontWeight.w500,
@@ -154,7 +160,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 16),
+
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
@@ -168,9 +176,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
+                              eventModel.address ?? '',
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              eventModel.address ?? '',
                               style: text.titleMedium!.copyWith(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w500,
@@ -181,7 +189,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 16),
+
                   Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: AppColors.primary),
@@ -217,7 +227,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               ),
                               onPressed: () {
                                 if (locationProvider.userLoccation != null) {
-                                  _centerMap(locationProvider.userLoccation!);
+                                  DetailsLogic.centerMap(
+                                    mapController,
+                                    locationProvider.userLoccation!,
+                                  );
                                 }
                               },
                               child: const Icon(
@@ -233,8 +246,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   ),
 
                   const SizedBox(height: 16),
+
                   Text(
-                    'Description',
+                    appLocalizations.descriptionLabel,
                     style: text.titleMedium!.copyWith(
                       color: AppColors.white,
                       fontWeight: FontWeight.w800,
@@ -256,39 +270,5 @@ class _DetailsScreenState extends State<DetailsScreen> {
         );
       },
     );
-  }
-
-  void _centerMap(LatLng newLatLng) {
-    mapController?.animateCamera(CameraUpdate.newLatLng(newLatLng));
-  }
-
-  void _initCircles() {
-    EventsProvider eventsProvider = Provider.of<EventsProvider>(
-      context,
-      listen: false,
-    );
-
-    circles.clear();
-
-    for (var event in eventsProvider.allEvents) {
-      // ✅ تجاهل أي event ملوش lat/long
-      if (event.lat == null || event.long == null) continue;
-
-      final isCurrentEvent = event.id == initialEvent.id;
-
-      circles.add(
-        Circle(
-          circleId: CircleId(event.id),
-          center: LatLng(event.lat!, event.long!),
-          radius: 7,
-          fillColor: isCurrentEvent ? AppColors.primary : AppColors.black,
-          strokeWidth: 20,
-          strokeColor:
-              isCurrentEvent
-                  ? AppColors.primary.withValues(alpha: 0.9)
-                  : AppColors.black.withValues(alpha: 0.9),
-        ),
-      );
-    }
   }
 }
