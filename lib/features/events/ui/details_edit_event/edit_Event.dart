@@ -1,6 +1,5 @@
 import 'package:evently/core/models/category_model.dart';
 import 'package:evently/core/models/event_models.dart';
-import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
@@ -8,7 +7,6 @@ import 'package:evently/core/utils/localization_helper.dart';
 import 'package:evently/core/utils/tab_item.dart';
 import 'package:evently/features/events/logic/edit_event_logic.dart';
 import 'package:evently/l10n/app_localizations.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -268,34 +266,4 @@ class _EditEventScreenState extends State<EditEventScreen> {
       ),
     );
   }
-
-  // void updateEvent() async {
-  //   if (formkey.currentState!.validate()) {
-  //     DateTime dateTime = DateTime(
-  //       selectedDate.year,
-  //       selectedDate.month,
-  //       selectedDate.day,
-  //       selectedTime.hour,
-  //       selectedTime.minute,
-  //     );
-
-  //     EventModel updatedEvent = EventModel(
-  //       userId: FirebaseAuth.instance.currentUser!.uid,
-  //       id: widget.event.id,
-  //       category: selectedCategory,
-  //       title: titleController.text,
-  //       description: descriptionController.text,
-  //       dateTime: dateTime,
-  //       lat: widget.event.lat,
-  //       long: widget.event.long,
-  //       address: widget.event.address,
-  //     );
-
-  //     await FireBaseService.updateEvent(updatedEvent);
-
-  //     if (mounted) {
-  //       Navigator.of(context).pop(updatedEvent);
-  //     }
-  //   }
-  // }
 }

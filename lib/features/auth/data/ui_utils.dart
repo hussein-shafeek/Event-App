@@ -9,7 +9,7 @@ class UIUtils {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(appLocalizations.translate(message) ?? message),
+        content: Text(appLocalizations.translate(message)),
         backgroundColor: AppColors.green,
         duration: const Duration(seconds: 3),
       ),

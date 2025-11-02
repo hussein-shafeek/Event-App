@@ -48,7 +48,7 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
 
   // هيتمسح بعدين
-  // await prefs.remove('onboarding_shown');
+  await prefs.remove('onboarding_shown');
 
   // @desc: Check if the 'onboarding_shown' key exists. If it's null (first time), it defaults to false.
   showOnboarding = prefs.getBool('onboarding_shown') ?? false;

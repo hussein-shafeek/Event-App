@@ -17,12 +17,12 @@ class ProfileHeader extends StatelessWidget {
     final isRTL = Directionality.of(context) == TextDirection.rtl;
 
     final String userName =
-        userProvider.currentUser?.name?.isNotEmpty == true
+        userProvider.currentUser?.name.isNotEmpty == true
             ? userProvider.currentUser!.name
             : t.name; // 🔹 لو مفيش اسم يظهر النص المترجم "الاسم"
 
     final String userEmail =
-        userProvider.currentUser?.email?.isNotEmpty == true
+        userProvider.currentUser?.email.isNotEmpty == true
             ? userProvider.currentUser!.email
             : t.email; // 🔹 لو مفيش إيميل يظهر النص المترجم "البريد الإلكتروني"
 

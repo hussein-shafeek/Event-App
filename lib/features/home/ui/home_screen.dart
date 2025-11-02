@@ -22,7 +22,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
-    final isRTL = Directionality.of(context) == TextDirection.rtl;
     return Scaffold(
       body: tabs[currentIndex],
       floatingActionButton: FloatingActionButton(

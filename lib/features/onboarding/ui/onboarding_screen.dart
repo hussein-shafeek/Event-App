@@ -24,6 +24,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _finishOnboarding(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_shown', true);
+    // ignore: use_build_context_synchronously
     Navigator.pushReplacementNamed(context, AppRoutes.loginScreen);
   }
 

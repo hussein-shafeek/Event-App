@@ -13,15 +13,6 @@ class LocationServices {
     return pickedLocation;
   }
 
-  // static Future<String> getLocationAddress(LatLng latling) async {
-  //   List<Placemark> placemarker = await placemarkFromCoordinates(
-  //     latling.latitude,
-  //     latling.longitude,
-  //   );
-
-  //   return '${placemarker[0].subLocality} , ${placemarker[0].locality} , ${placemarker[0].administrativeArea} , ${placemarker[0].postalCode}';
-  // }
-
   static Future<String> getLocationAddress(
     BuildContext context,
     LatLng latLng,

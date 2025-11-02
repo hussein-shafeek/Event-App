@@ -1,4 +1,3 @@
-import 'package:evently/core/models/category_model.dart';
 import 'package:evently/core/models/event_models.dart';
 import 'package:evently/core/providers/events_provider.dart';
 import 'package:evently/core/services/firebase.dart';
@@ -17,8 +16,6 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-  CategoryModel? _selectedCategory;
-
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;

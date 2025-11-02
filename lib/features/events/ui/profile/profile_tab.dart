@@ -17,7 +17,7 @@ class ProfileTab extends StatelessWidget {
     final settingProvider = Provider.of<SettingProvider>(context);
     final text = Theme.of(context).textTheme;
     final appLocalizations = AppLocalizations.of(context)!;
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    Provider.of<UserProvider>(context, listen: false);
     final isRTL = Directionality.of(context) == TextDirection.rtl;
 
     return Column(

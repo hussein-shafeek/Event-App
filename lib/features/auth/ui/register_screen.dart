@@ -1,13 +1,10 @@
-import 'package:evently/core/providers/user_provider.dart';
+import 'package:evently/core/providers/setting_provider.dart';
 import 'package:evently/core/routes/routes.dart';
-import 'package:evently/core/services/firebase.dart';
 
 import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
-import 'package:evently/features/auth/data/ui_utils.dart';
 import 'package:evently/features/auth/logic/register_logic.dart';
 import 'package:evently/l10n/app_localizations.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,6 +27,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     double height = MediaQuery.sizeOf(context).height;
     TextTheme text = Theme.of(context).textTheme;
     final t = AppLocalizations.of(context)!;
+    final settingProvider = Provider.of<SettingProvider>(context);
 
     return Scaffold(
       resizeToAvoidBottomInset: true,

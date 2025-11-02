@@ -1,17 +1,15 @@
 import 'package:evently/core/models/category_model.dart';
-import 'package:evently/core/models/event_models.dart';
 import 'package:evently/core/providers/location_provider.dart';
 import 'package:evently/core/providers/setting_provider.dart';
-import 'package:evently/core/services/firebase.dart';
 import 'package:evently/core/theme/app_colors.dart';
 import 'package:evently/core/utils/default_elevated_button.dart';
 import 'package:evently/core/utils/default_text_form_field.dart';
 import 'package:evently/core/utils/tab_item.dart';
-import 'package:evently/features/auth/data/ui_utils.dart';
+
 import 'package:evently/features/events/logic/create_event_logic.dart';
 import 'package:evently/features/events/logic/location_services.dart';
 import 'package:evently/l10n/app_localizations.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
