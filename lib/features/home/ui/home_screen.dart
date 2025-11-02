@@ -1,9 +1,11 @@
+import 'package:evently/core/routes/routes.dart';
 import 'package:evently/core/theme/app_colors.dart';
-import 'package:evently/features/events/ui/love_tab.dart';
-import 'package:evently/features/events/ui/map_tap.dart';
-import 'package:evently/features/events/ui/profile_tab.dart';
+import 'package:evently/features/events/ui/love/love_tab.dart';
+import 'package:evently/features/events/ui/map/map_tap.dart';
+import 'package:evently/features/events/ui/profile/profile_tab.dart';
 import 'package:evently/features/home/data/nav_bar_icon.dart';
 import 'package:evently/features/home/ui/home_tab/home_tab.dart';
+import 'package:evently/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,10 +21,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
     return Scaffold(
       body: tabs[currentIndex],
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => Navigator.pushNamed(context, AppRoutes.createEvent),
+        //backgroundColor: AppColors.primary,
+        shape: CircleBorder(),
         child: Icon(Icons.add, size: 36),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -45,22 +50,22 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
               icon: NavBarIcon(imageName: 'Home'),
               activeIcon: NavBarIcon(imageName: 'sHome'),
-              label: "Home",
+              label: appLocalizations.home,
             ),
             BottomNavigationBarItem(
               icon: NavBarIcon(imageName: 'map'),
               activeIcon: NavBarIcon(imageName: 'smap'),
-              label: "Map",
+              label: appLocalizations.map,
             ),
             BottomNavigationBarItem(
               icon: NavBarIcon(imageName: 'IconLove'),
               activeIcon: NavBarIcon(imageName: 'sHeart'),
-              label: "Love",
+              label: appLocalizations.love,
             ),
             BottomNavigationBarItem(
               icon: NavBarIcon(imageName: 'Profile'),
               activeIcon: NavBarIcon(imageName: 'sprofile'),
-              label: "Profile",
+              label: appLocalizations.profile,
             ),
           ],
         ),
